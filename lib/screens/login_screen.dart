@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import 'home_screen.dart';
 import 'registration_screen.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -53,12 +55,18 @@ class _LoginScreenState extends State<LoginScreen>
     final auth = Provider.of<AuthProvider>(context, listen: false);
     final error = await auth.login(_username.text.trim(), _password.text);
     if (error == null) {
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (_) => const HomeScreen()));
-    } else {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(error)));
-    }
+  Fluttertoast.showToast(
+    msg: "Login Successful 🎉",
+    backgroundColor: Colors.green,
+  );
+  Navigator.pushReplacement(
+    context, MaterialPageRoute(builder: (_) => const HomeScreen()));
+} else {
+  Fluttertoast.showToast(
+    msg: error,
+    backgroundColor: Colors.red,
+  );
+}
   }
 
   @override

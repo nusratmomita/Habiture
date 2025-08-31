@@ -90,7 +90,7 @@ class _SplashScreenState extends State<SplashScreen>
                   style: TextStyle(
                     fontSize: 36,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: Color.fromARGB(255, 44, 0, 38),
                     letterSpacing: 2,
                   ),
                 ),
