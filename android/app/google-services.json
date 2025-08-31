@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "776071747219",
+    "project_id": "habiture-7c263",
+    "storage_bucket": "habiture-7c263.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:776071747219:android:af18b9194324392d2c9f66",
+        "android_client_info": {
+          "package_name": "com.example.habiture"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAvdu9LUR46sUROJvDXu8sevCoXducEzMg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
