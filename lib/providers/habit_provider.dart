@@ -1,7 +1,7 @@
 // ChangeNotifier is used notify the UI whenever the data changed
 import 'package:flutter/material.dart';// gives access to Flutter UI and state management tools
 import '../models/habit.dart';// defines the HabitModel (means a habit)
-// import '../services/firestore_service.dart';
+import '../services/firestore_service.dart';
 
 class HabitProvider extends ChangeNotifier { // ChangeNotifier → allows notifying listeners (widgets) when data changes
   final String userId;

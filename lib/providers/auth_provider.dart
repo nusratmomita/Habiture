@@ -1,58 +1,86 @@
 import 'package:flutter/material.dart';
-import '../models/user.dart';
-import '../utils/storage.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class AuthProvider extends ChangeNotifier {
-  bool _loading = false;
-  bool get loading => _loading;
+class AuthProvider with ChangeNotifier {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  void setLoading(bool val) {
-    _loading = val;
-    notifyListeners();
-  }
+  User? get currentUser => _auth.currentUser;
 
-  Future<String?> register(User user) async {
-    setLoading(true);
-    List<User> users = await Storage.getUsers();
+  // 🔹 Register User
+  Future<String?> registerUser({
+    required String email,
+    required String password,
+    required String displayName,
+    String? gender,
+    Map<String, dynamic>? otherDetails,
+  }) async {
+    try {
+      // ✅ Create User in Firebase Auth
+      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
 
-    if (users.any((u) => u.username == user.username)) {
-      setLoading(false);
-      return 'Username already exists';
+      User? user = userCredential.user;
+
+      if (user != null) {
+        String userId = user.uid;
+
+        // ✅ Update display name in Firebase Auth profile
+        await user.updateDisplayName(displayName);
+
+        // ✅ Save user data in Firestore
+        await _firestore.collection('users').doc(userId).set({
+          'uid': userId,
+          'displayName': displayName,
+          'email': email,
+          'gender': gender ?? '',
+          'otherDetails': (otherDetails != null &&
+              otherDetails is Map<String, dynamic>)
+              ? otherDetails
+              : {},
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+
+        notifyListeners();
+        return null; // success
+      }
+      return "Unknown error: User is null";
+    } on FirebaseAuthException catch (e) {
+      debugPrint("❌ FirebaseAuth error: ${e.message}");
+      return e.message;
+    } catch (e) {
+      debugPrint("❌ Unknown error (register): $e");
+      return "An unexpected error occurred: $e";
     }
-
-    await Storage.saveUser(user);
-    setLoading(false);
-    return null;
   }
 
-  Future<String?> login(String username, String password) async {
-  setLoading(true);
-  List<User> users = await Storage.getUsers();
-  
-  User? user;
-  try {
-    user = users.firstWhere(
-        (u) => u.username == username && u.password == password);
-  } catch (e) {
-    user = null; // user not found
+  // 🔹 Login User
+  Future<String?> loginUser({
+    required String email,
+    required String password,
+  }) async {
+    try {
+      await _auth.signInWithEmailAndPassword(email: email, password: password);
+      notifyListeners();
+      return null; // success
+    } on FirebaseAuthException catch (e) {
+      debugPrint("❌ FirebaseAuth error: ${e.message}");
+      return e.message;
+    } catch (e) {
+      debugPrint("❌ Unknown error (login): $e");
+      return "An unexpected error occurred: $e";
+    }
   }
 
-  if (user == null) {
-    setLoading(false);
-    return 'Invalid username or password';
-  }
-
-  await Storage.saveUser(user); // remember session
-  setLoading(false);
-  return null;
-}
-
+  // 🔹 Logout
   Future<void> logout() async {
-    await Storage.clearCurrentUser();
+    await _auth.signOut();
     notifyListeners();
   }
 
-  Future<User?> getCurrentUser() async {
-    return await Storage.getCurrentUser();
-  }
+  // 🔹 Listen to auth state
+  Stream<User?> get authStateChanges => _auth.authStateChanges();
 }

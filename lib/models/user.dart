@@ -1,31 +1,32 @@
-class User {
-  final String username;
-  final String password;
-  final String? gender;
-  final String? dob;
+class UserModel {
+  final String id;
+  final String name;
+  final String email;
+  final String? photoUrl;
 
-  User({
-    required this.username,
-    required this.password,
-    this.gender,
-    this.dob,
+  UserModel({
+    required this.id,
+    required this.name,
+    required this.email,
+    this.photoUrl,
   });
 
-  Map<String, String?> toMap() {
-    return {
-      'username': username,
-      'password': password,
-      'gender': gender,
-      'dob': dob,
-    };
+  // Convert Firestore doc → Model
+  factory UserModel.fromMap(Map<String, dynamic> data, String documentId) {
+    return UserModel(
+      id: documentId,
+      name: data['name'] ?? '',
+      email: data['email'] ?? '',
+      photoUrl: data['photoUrl'],
+    );
   }
 
-  factory User.fromMap(Map<String, dynamic> map) {
-    return User(
-      username: map['username'],
-      password: map['password'],
-      gender: map['gender'],
-      dob: map['dob'],
-    );
+  // Convert Model → Map (Firestore save)
+  Map<String, dynamic> toMap() {
+    return {
+      'name': name,
+      'email': email,
+      'photoUrl': photoUrl,
+    };
   }
 }

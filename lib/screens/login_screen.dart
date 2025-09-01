@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/auth_provider.dart';
-import 'home_screen.dart';
-import 'registration_screen.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-
+import '../../providers/auth_provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -13,165 +9,164 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen>
-    with SingleTickerProviderStateMixin {
-  final TextEditingController _username = TextEditingController();
-  final TextEditingController _password = TextEditingController();
+class _LoginScreenState extends State<LoginScreen> {
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  bool _isLoading = false;
 
-  late AnimationController _animationController;
-  late Animation<Offset> _slideAnimation;
-  late Animation<double> _fadeAnimation;
+  Future<void> _login() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    setState(() => _isLoading = true);
 
-  @override
-  void initState() {
-    super.initState();
-
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 800),
+    String? error = await authProvider.loginUser(
+      email: _emailController.text.trim(),
+      password: _passwordController.text.trim(),
     );
 
-    _slideAnimation =
-        Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero)
-            .animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeOut,
-    ));
+    setState(() => _isLoading = false);
 
-    _fadeAnimation = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
-    );
-
-    _animationController.forward();
-  }
-
-  @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
-  }
-
-  void _login() async {
-    final auth = Provider.of<AuthProvider>(context, listen: false);
-    final error = await auth.login(_username.text.trim(), _password.text);
     if (error == null) {
-  Fluttertoast.showToast(
-    msg: "Login Successful 🎉",
-    backgroundColor: Colors.green,
-  );
-  Navigator.pushReplacement(
-    context, MaterialPageRoute(builder: (_) => const HomeScreen()));
-} else {
-  Fluttertoast.showToast(
-    msg: error,
-    backgroundColor: Colors.red,
-  );
-}
+      if (mounted) {
+        Navigator.pushReplacementNamed(context, '/home');
+      }
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(error)),
+        );
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final auth = Provider.of<AuthProvider>(context);
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors:[ Color.fromARGB(255, 184, 191, 237),Color.fromARGB(255, 215, 172, 248)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
-        child: auth.loading
-            ? const Center(child: CircularProgressIndicator(color: Colors.white))
-            : Center(
-                child: SingleChildScrollView(
-                  child: FadeTransition(
-                    opacity: _fadeAnimation,
-                    child: SlideTransition(
-                      position: _slideAnimation,
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 30),
-                        padding: const EdgeInsets.all(30),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.9),
-                          borderRadius: BorderRadius.circular(25),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black26,
-                              blurRadius: 10,
-                              offset: const Offset(0, 5),
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(
-                              Icons.lock,
-                              size: 80,
-                              color: Color(0xFF6D0EB5),
-                            ),
-                            const SizedBox(height: 20),
-                            TextField(
-                              controller: _username,
-                              decoration: const InputDecoration(
-                                labelText: 'Username',
-                                prefixIcon: Icon(Icons.person),
-                                border: OutlineInputBorder(),
-                              ),
-                            ),
-                            const SizedBox(height: 15),
-                            TextField(
-                              controller: _password,
-                              decoration: const InputDecoration(
-                                labelText: 'Password',
-                                prefixIcon: Icon(Icons.lock),
-                                border: OutlineInputBorder(),
-                              ),
-                              obscureText: true,
-                            ),
-                            const SizedBox(height: 25),
-                            SizedBox(
-                              width: double.infinity,
-                              height: 50,
-                              child: ElevatedButton(
-                                onPressed: _login,
-                                style: ElevatedButton.styleFrom(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  backgroundColor: const Color.fromARGB(255, 206, 176, 227),
-                                  textStyle: const TextStyle(
-                                      fontSize: 18, fontWeight: FontWeight.bold),
-                                ),
-                                child: const Text('Login'),
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                            TextButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (_) =>
-                                          const RegistrationScreen()),
-                                );
-                              },
-                              child: const Text(
-                                'Register',
-                                style: TextStyle(
-                                  color: Color.fromARGB(255, 68, 9, 81),
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Welcome back text
+                Text(
+                  "Welcome back",
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFF4CAF50), // Green color
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                // Larger Application Logo
+                // const CircleAvatar(
+                //   radius: 80, // Increased from 60
+                //   backgroundColor: Colors.transparent,
+                //   backgroundImage: AssetImage('assets/logo.png'),
+                // ),
+                const SizedBox(height: 40),
+
+                // Larger Email Input Field
+                SizedBox(
+                  width: 350, // Increased from 300
+                  child: TextField(
+                    controller: _emailController,
+                    decoration: InputDecoration(
+                      labelText: "Email",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12), // Slightly more rounded
+                      ),
+                      prefixIcon: const Icon(Icons.email, size: 24), // Larger icon
+                      contentPadding: const EdgeInsets.symmetric(
+                          vertical: 18, horizontal: 18), // Increased padding
+                    ),
+                    keyboardType: TextInputType.emailAddress,
+                    style: const TextStyle(fontSize: 18), // Larger text
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // Larger Password Input Field
+                SizedBox(
+                  width: 350, // Increased from 300
+                  child: TextField(
+                    controller: _passwordController,
+                    decoration: InputDecoration(
+                      labelText: "Password",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      prefixIcon: const Icon(Icons.lock, size: 24), // Larger icon
+                      contentPadding: const EdgeInsets.symmetric(
+                          vertical: 18, horizontal: 18),
+                    ),
+                    obscureText: true,
+                    style: const TextStyle(fontSize: 18), // Larger text
+                  ),
+                ),
+                const SizedBox(height: 32),
+
+                // Larger Login Button
+                SizedBox(
+                  width: 350, // Increased from 300
+                  height: 60, // Increased from 50
+                  child: _isLoading
+                      ? const Center(
+                    child: CircularProgressIndicator(
+                      strokeWidth: 3,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                          Color(0xFF4CAF50)),
+                    ),
+                  )
+                      : ElevatedButton(
+                    onPressed: _login,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF4CAF50), // Green color
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 5,
+                    ),
+                    child: const Text(
+                      "LOGIN",
+                      style: TextStyle(
+                        fontSize: 18, // Larger text
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
                       ),
                     ),
                   ),
                 ),
-              ),
+                const SizedBox(height: 24),
+
+                // Register Option
+                TextButton(
+                  onPressed: () {
+                    Navigator.pushReplacementNamed(context, '/register');
+                  },
+                  child: Text.rich(
+                    TextSpan(
+                      text: "Don't have an account? ",
+                      style: const TextStyle(
+                          color: Colors.grey, fontSize: 16), // Slightly larger
+                      children: [
+                        TextSpan(
+                          text: "Register",
+                          style: TextStyle(
+                            color: const Color(0xFF4CAF50), // Green color
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

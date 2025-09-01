@@ -27,26 +27,33 @@ class _SplashScreenState extends State<SplashScreen>
       duration: const Duration(seconds: 2),
     );
 
-    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.2).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _scaleAnimation = Tween<double>(
+      begin: 0.8,
+      end: 1.2,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
 
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeIn),
-    );
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeIn));
 
     _controller.repeat(reverse: true);
 
     // Navigation after delay
     Future.delayed(const Duration(seconds: 3), () async {
       final auth = Provider.of<AuthProvider>(context, listen: false);
-      final user = await auth.getCurrentUser();
+      final user = auth.currentUser; // ✅ use getter
+
       if (user != null) {
         Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (_) => const HomeScreen()));
+          context,
+          MaterialPageRoute(builder: (_) => const HomeScreen()),
+        );
       } else {
         Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (_) => const LoginScreen()));
+          context,
+          MaterialPageRoute(builder: (_) => const LoginScreen()),
+        );
       }
     });
   }
@@ -63,7 +70,10 @@ class _SplashScreenState extends State<SplashScreen>
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color.fromARGB(255, 215, 172, 248), Color.fromARGB(255, 184, 191, 237)],
+            colors: [
+              Color.fromARGB(255, 215, 172, 248),
+              Color.fromARGB(255, 184, 191, 237),
+            ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -104,7 +114,7 @@ class _SplashScreenState extends State<SplashScreen>
                   style: TextStyle(
                     fontSize: 16,
                     color: Colors.black,
-                    fontWeight: FontWeight.w900
+                    fontWeight: FontWeight.w900,
                   ),
                 ),
               ),
