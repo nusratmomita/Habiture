@@ -50,7 +50,7 @@ class HabitModel {
     if (completedDates.isEmpty) return 0;// not continued
 
     final sortedDates = List<DateTime>.from(completedDates)
-      ..sort((a, b) => a.compareTo(b));
+      ..sort((a, b) => b.compareTo(a));
 
     int streak = 0;
     DateTime current = DateTime.now();
@@ -93,7 +93,7 @@ class HabitModel {
     if (completedDates.isEmpty) return [];
 
     final sortedDates = List<DateTime>.from(completedDates)
-      ..sort((a, b) => a.compareTo(b));
+      ..sort((a, b) => b.compareTo(a));
 
     final streak = <DateTime>[];
     DateTime current = DateTime.now();
