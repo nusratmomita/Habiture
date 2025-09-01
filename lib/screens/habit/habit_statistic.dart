@@ -9,6 +9,7 @@ class HabitStatisticsTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Generate weekly (7 days) and monthly (4 weeks) data from the habit model
     final weeklyData = _generateWeeklyData();
     final monthlyData = _generateMonthlyData();
     final theme = Theme.of(context);
@@ -17,19 +18,20 @@ class HabitStatisticsTab extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
-          // Weekly Progress
+          // ---------------- WEEKLY PROGRESS ----------------
           _buildSectionTitle('Weekly Progress', theme),
           _buildBarChart(weeklyData, theme),
           const SizedBox(height: 24),
 
-          // Monthly Progress
+          // ---------------- MONTHLY PROGRESS ----------------
           _buildSectionTitle('Monthly Progress', theme),
           _buildLineChart(monthlyData, theme),
           const SizedBox(height: 24),
 
-          // Stats Cards
+          // ---------------- STATS CARDS ----------------
           Row(
             children: [
+              // Current streak card
               _buildStatCard(
                 'Current Streak',
                 '${habit.currentStreak} days',
@@ -38,6 +40,8 @@ class HabitStatisticsTab extends StatelessWidget {
                 theme,
               ),
               const SizedBox(width: 16),
+
+              // Longest streak card
               _buildStatCard(
                 'Longest Streak',
                 '${habit.longestStreak} days',
@@ -48,6 +52,8 @@ class HabitStatisticsTab extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
+
+          // Weekly completion percentage card
           _buildStatCard(
             'Weekly Completion',
             '${habit.completionPercentage.toStringAsFixed(0)}%',
@@ -61,6 +67,7 @@ class HabitStatisticsTab extends StatelessWidget {
     );
   }
 
+  // ---------- Section Title ----------
   Widget _buildSectionTitle(String title, ThemeData theme) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -73,6 +80,7 @@ class HabitStatisticsTab extends StatelessWidget {
     );
   }
 
+  // ---------- Stats Card ----------
   Widget _buildStatCard(
     String title,
     String value,
@@ -82,7 +90,7 @@ class HabitStatisticsTab extends StatelessWidget {
     bool fullWidth = false,
   }) {
     return SizedBox(
-      width: fullWidth ? double.infinity : null,
+      width: fullWidth ? double.infinity : null, // expands if fullWidth = true
       child: Card(
         elevation: 2,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -91,6 +99,7 @@ class HabitStatisticsTab extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Card header (icon + label)
               Row(
                 children: [
                   Icon(icon, color: iconColor),
@@ -104,6 +113,7 @@ class HabitStatisticsTab extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 8),
+              // Value (streak count or percentage)
               Text(
                 value,
                 style: theme.textTheme.headlineSmall?.copyWith(
@@ -117,6 +127,7 @@ class HabitStatisticsTab extends StatelessWidget {
     );
   }
 
+  // ---------- Weekly Bar Chart ----------
   Widget _buildBarChart(List<double> data, ThemeData theme) {
     return SizedBox(
       height: 220,
@@ -124,7 +135,7 @@ class HabitStatisticsTab extends StatelessWidget {
         BarChartData(
           alignment: BarChartAlignment.spaceAround,
           minY: 0,
-          maxY: 1.2,
+          maxY: 1.2, // only two values: 0 (not done) or 1 (done)
           barTouchData: BarTouchData(
             enabled: true,
             touchTooltipData: BarTouchTooltipData(
@@ -132,15 +143,11 @@ class HabitStatisticsTab extends StatelessWidget {
               tooltipPadding: const EdgeInsets.all(8),
               getTooltipColor: (group) => theme.colorScheme.surface,
               getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                // Map index to day of week
                 final dayName = [
-                  'Sun',
-                  'Mon',
-                  'Tue',
-                  'Wed',
-                  'Thu',
-                  'Fri',
-                  'Sat',
+                  'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat',
                 ][group.x.toInt()];
+
                 return BarTooltipItem(
                   '${dayName}\n${rod.toY == 1 ? 'Completed' : 'Not completed'}',
                   TextStyle(
@@ -159,6 +166,7 @@ class HabitStatisticsTab extends StatelessWidget {
               },
             ),
           ),
+          // Bars for each day
           barGroups: data.asMap().entries.map((entry) {
             final index = entry.key;
             final value = entry.value;
@@ -175,6 +183,7 @@ class HabitStatisticsTab extends StatelessWidget {
                       : theme.colorScheme.error.withOpacity(0.3),
                   width: 22,
                   borderRadius: BorderRadius.circular(6),
+                  // highlight today with a border
                   borderSide: isToday
                       ? BorderSide(color: theme.colorScheme.secondary, width: 2)
                       : BorderSide.none,
@@ -187,8 +196,8 @@ class HabitStatisticsTab extends StatelessWidget {
               ],
             );
           }).toList(),
+          // Axis labels
           titlesData: FlTitlesData(
-            show: true,
             bottomTitles: AxisTitles(
               sideTitles: SideTitles(
                 showTitles: true,
@@ -217,12 +226,8 @@ class HabitStatisticsTab extends StatelessWidget {
                 showTitles: true,
                 reservedSize: 28,
                 getTitlesWidget: (value, meta) {
-                  if (value == 0) {
-                    return Text('0', style: theme.textTheme.bodySmall);
-                  }
-                  if (value == 1) {
-                    return Text('1', style: theme.textTheme.bodySmall);
-                  }
+                  if (value == 0) return Text('0', style: theme.textTheme.bodySmall);
+                  if (value == 1) return Text('1', style: theme.textTheme.bodySmall);
                   return const SizedBox();
                 },
               ),
@@ -230,6 +235,7 @@ class HabitStatisticsTab extends StatelessWidget {
             rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
             topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
           ),
+          // Grid & borders
           gridData: FlGridData(
             show: true,
             drawVerticalLine: false,
@@ -249,13 +255,14 @@ class HabitStatisticsTab extends StatelessWidget {
     );
   }
 
+  // ---------- Monthly Line Chart ----------
   Widget _buildLineChart(List<double> data, ThemeData theme) {
     return SizedBox(
       height: 200,
       child: LineChart(
         LineChartData(
           minY: 0,
-          maxY: data.reduce((a, b) => a > b ? a : b) + 2,
+          maxY: data.reduce((a, b) => a > b ? a : b) + 2, // auto scale
           lineTouchData: LineTouchData(
             enabled: true,
             touchTooltipData: LineTouchTooltipData(
@@ -275,6 +282,7 @@ class HabitStatisticsTab extends StatelessWidget {
               },
             ),
           ),
+          // Line graph
           lineBarsData: [
             LineChartBarData(
               spots: data
@@ -292,6 +300,7 @@ class HabitStatisticsTab extends StatelessWidget {
                 show: true,
                 color: theme.colorScheme.primary.withOpacity(0.1),
               ),
+              // Dots for each data point
               dotData: FlDotData(
                 show: true,
                 getDotPainter: (spot, percent, barData, index) {
@@ -305,6 +314,7 @@ class HabitStatisticsTab extends StatelessWidget {
               ),
             ),
           ],
+          // Axis labels
           titlesData: FlTitlesData(
             bottomTitles: AxisTitles(
               sideTitles: SideTitles(
@@ -354,28 +364,29 @@ class HabitStatisticsTab extends StatelessWidget {
     );
   }
 
+  // ---------- Generate Weekly Data (Sun - Sat) ----------
   List<double> _generateWeeklyData() {
     final now = DateTime.now();
-    final weekStart = now.subtract(Duration(days: now.weekday));
+    final weekStart = now.subtract(Duration(days: now.weekday)); // start of week (Sunday)
     return List.generate(7, (index) {
       final date = weekStart.add(Duration(days: index));
       return habit.completedDates.any(
-            (d) =>
-                d.year == date.year &&
-                d.month == date.month &&
-                d.day == date.day,
-          )
-          ? 1.0
-          : 0.0;
+        (d) =>
+            d.year == date.year &&
+            d.month == date.month &&
+            d.day == date.day,
+      ) ? 1.0 : 0.0;
     });
   }
 
+  // ---------- Generate Monthly Data (last 4 weeks) ----------
   List<double> _generateMonthlyData() {
     final now = DateTime.now();
     return List.generate(4, (index) {
       final weekStart = now.subtract(Duration(days: (3 - index) * 7));
       int streak = 0;
 
+      // count streak inside the week
       for (int i = 0; i < 7; i++) {
         final date = weekStart.add(Duration(days: i));
         if (habit.completedDates.any(

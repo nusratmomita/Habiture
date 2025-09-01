@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';// !
 
+// AuthProvider manages Firebase Authentication and user data in Firestore
 class AuthProvider with ChangeNotifier {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance; // Firebase Auth instance
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance; // ! Firestore instance
 
+  // Current logged-in user
   User? get currentUser => _auth.currentUser;
 
-  // 🔹 Register User
+  //create a new User
   Future<String?> registerUser({
     required String email,
     required String password,
@@ -17,7 +19,6 @@ class AuthProvider with ChangeNotifier {
     Map<String, dynamic>? otherDetails,
   }) async {
     try {
-      // ✅ Create User in Firebase Auth
       UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
@@ -28,32 +29,35 @@ class AuthProvider with ChangeNotifier {
       if (user != null) {
         String userId = user.uid;
 
-        // ✅ Update display name in Firebase Auth profile
+        // Set display name in Firebase Auth profile
         await user.updateDisplayName(displayName);
 
-        // ✅ Save user data in Firestore
+        // Create user document in Firestore
         await _firestore.collection('users').doc(userId).set({
           'uid': userId,
           'displayName': displayName,
           'email': email,
-          'gender': gender ?? '',
+          'gender': gender ?? '', // store gender if provided
           'otherDetails': (otherDetails != null &&
-              otherDetails is Map<String, dynamic>)
+                  otherDetails is Map<String, dynamic>)
               ? otherDetails
-              : {},
-          'createdAt': FieldValue.serverTimestamp(),
+              : {}, // optional extra fields
+          'createdAt': FieldValue.serverTimestamp(), // creation timestamp
         });
 
-        notifyListeners();
+        notifyListeners(); // notify UI of auth changes
         return null; // success
       }
+
+      // Fallback error if user is null
       return "Unknown error: User is null";
+
     } on FirebaseAuthException catch (e) {
-      debugPrint("❌ FirebaseAuth error: ${e.message}");
-      return e.message;
+      debugPrint("FirebaseAuth error: ${e.message}");
+      return e.message; // return Firebase auth error message
     } catch (e) {
-      debugPrint("❌ Unknown error (register): $e");
-      return "An unexpected error occurred: $e";
+      debugPrint("Unknown register: $e");
+      return "Error occurred: $e"; // return generic error
     }
   }
 
@@ -63,24 +67,25 @@ class AuthProvider with ChangeNotifier {
     required String password,
   }) async {
     try {
+      // Sign in with Firebase Auth
       await _auth.signInWithEmailAndPassword(email: email, password: password);
-      notifyListeners();
+      notifyListeners(); // notify UI of auth changes
       return null; // success
     } on FirebaseAuthException catch (e) {
-      debugPrint("❌ FirebaseAuth error: ${e.message}");
-      return e.message;
+      debugPrint("FirebaseAuth error: ${e.message}");
+      return e.message; // return Firebase auth error
     } catch (e) {
-      debugPrint("❌ Unknown error (login): $e");
-      return "An unexpected error occurred: $e";
+      debugPrint("Unknown login: $e");
+      return "Error occurred: $e"; // generic error
     }
   }
 
   // 🔹 Logout
   Future<void> logout() async {
-    await _auth.signOut();
-    notifyListeners();
+    await _auth.signOut(); // Sign out user
+    notifyListeners(); // notify UI
   }
 
-  // 🔹 Listen to auth state
+  // 🔹 Stream to listen to authentication state changes
   Stream<User?> get authStateChanges => _auth.authStateChanges();
 }

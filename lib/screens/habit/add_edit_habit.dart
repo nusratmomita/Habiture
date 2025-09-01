@@ -152,7 +152,7 @@ class _AddEditHabitScreenState extends State<AddEditHabitScreen> {
         actions: [
           if (isEditing)
             IconButton(
-              icon: const Icon(Icons.delete_forever, color: Colors.redAccent),
+              icon: const Icon(Icons.delete_forever, color: Color.fromARGB(255, 255, 82, 82)),
               tooltip: "Delete Habit",
               onPressed: _deleteHabit,
             ),

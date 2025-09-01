@@ -1,16 +1,25 @@
-# habiture
+<h1>Welcome To Arrogo💊</h1>
+<h2>Arrogo is a medicine e-commerce that helps users to find, buy, and pay for medicines easily. </h2>
 
-A new Flutter project.
+<h1>Key features🎇: </h1>
+<ul>
+  <li>Users can list, update, and delete medicines.</li>
+  <li>In the User Dashboard, Users can manage their paid and pending medicine payment details easily.</li>
+  <li>Seller can list, update, delete Categories, and add medicines.</li>
+  <li>Seller can visualize sales report in a chart format.</li>
+  <li> The Seller can add a new medicine.</li>
+  <li>In the Seller Dashboard, Sellers can manage their paid and unpaid medicine payment details easily.</li>
+  <li>In the Seller Dashboard, the  Seller can request an Ad and manage its tracking.</li>
+  <li>In Admin Dashboard,  Admin can approve the ad request from Sellers.</li>
+  <li>In the Admin Dashboard,  Admin can manage and approve payment history.</li>
+  <li>In Admin Dashboard,  Admin can Upgrade or Upgrade User to seller and vice versa.</li>
+  <li>Admin can add a new medicine category.</li>
+  <li>Email/Password and Google login/sign up.</li>
+</ul>
 
-## Getting Started
+<h1>Admin Email and Password: 🧧</h1>
+<h4>Email: nusratmomita@gmail.com</h4>
+<h4>Password: Nusrat</h4>
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+<h1>Live Link: 🔍</h1>
+<a href="https://aroggo-e998e.web.app/">[Click here]</a>

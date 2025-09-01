@@ -11,20 +11,28 @@ class ProgressScreen extends StatefulWidget {
 }
 
 class _ProgressScreenState extends State<ProgressScreen> {
-  List<int> weeklyData = List.filled(7, 0); // Mon-Sun
+  // Data for the weekly chart (7 days, Mon-Sun)
+  List<int> weeklyData = List.filled(7, 0);
+
+  // Current streak count
   int streak = 0;
+
+  // List of upcoming goals (habits with title, description, frequency)
   List<Map<String, dynamic>> upcomingGoals = [];
 
   @override
   void initState() {
     super.initState();
+    // Load habits when screen initializes
     _loadHabits();
   }
 
+  /// Load all habits from Firestore and prepare data for chart, streak, and upcoming goals
   Future<void> _loadHabits() async {
     final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return;
+    if (user == null) return; // Exit if user not logged in
 
+    // Fetch habits from Firestore for this user
     final habitsSnapshot = await FirebaseFirestore.instance
         .collection("users")
         .doc(user.uid)
@@ -35,20 +43,23 @@ class _ProgressScreenState extends State<ProgressScreen> {
 
     final now = DateTime.now();
 
-    // last 7 days for chart
+    // Generate last 7 days (from 6 days ago to today) for chart display
     final last7Days = List.generate(
       7,
       (i) => DateTime(now.year, now.month, now.day - (6 - i)),
     );
 
-    // Collect habits into list
+    // Temporary list to hold upcoming goals
     List<Map<String, dynamic>> goals = [];
 
+    // Iterate through each habit document
     for (var doc in habitsSnapshot.docs) {
       final habit = doc.data();
 
-      // Handle completedDates (if missing, just empty)
+      // Handle completedDates safely (may not exist)
       final List<dynamic> completedDates = habit["completedDates"] ?? [];
+
+      // Convert all dates to DateTime objects
       final completed = completedDates
           .map<DateTime>((d) {
             if (d is Timestamp) return d.toDate();
@@ -56,20 +67,20 @@ class _ProgressScreenState extends State<ProgressScreen> {
           })
           .toList();
 
-      // Weekly data → mark if habit was completed in last 7 days
+      // Prepare weekly data: 1 if completed on that day, 0 otherwise
       final week = last7Days
           .map((day) => completed.any((c) => _isSameDay(c, day)) ? 1 : 0)
           .toList();
 
-      // Merge with global weeklyData (if multiple habits exist)
+      // Merge this habit's week data into global weeklyData
       for (int i = 0; i < week.length; i++) {
         if (week[i] == 1) weeklyData[i] = 1;
       }
 
-      // Streak (for now just based on one habit; you can extend this later)
+      // Calculate streak based on this habit's completed dates
       streak = _calculateStreak(completed);
 
-      // Add to upcoming goals list
+      // Add habit info to upcoming goals list
       goals.add({
         "title": habit["title"] ?? "",
         "frequency": habit["frequency"] ?? "",
@@ -77,25 +88,29 @@ class _ProgressScreenState extends State<ProgressScreen> {
       });
     }
 
+    // Update state to trigger UI rebuild
     setState(() {
       upcomingGoals = goals;
     });
   }
 
+  /// Check if two DateTime objects fall on the same calendar day
   bool _isSameDay(DateTime a, DateTime b) {
     return a.year == b.year && a.month == b.month && a.day == b.day;
   }
 
+  /// Calculate current streak: consecutive days with completed habits
   int _calculateStreak(List<DateTime> completed) {
     int count = 0;
     DateTime today = DateTime.now();
 
+    // Check up to last 30 days
     for (int i = 0; i < 30; i++) {
       final day = DateTime(today.year, today.month, today.day - i);
       if (completed.any((c) => _isSameDay(c, day))) {
         count++;
       } else {
-        break;
+        break; // Streak ends at first day missed
       }
     }
     return count;
@@ -112,13 +127,14 @@ class _ProgressScreenState extends State<ProgressScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Weekly Progress Chart Title
             const Text(
               "Weekly Progress",
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
 
-            // Chart
+            // Bar chart showing last 7 days of completion
             SizedBox(
               height: 200,
               child: BarChart(
@@ -143,16 +159,11 @@ class _ProgressScreenState extends State<ProgressScreen> {
                         },
                       ),
                     ),
-                    leftTitles: AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                    rightTitles: AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                    topTitles: AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
+                    leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
                   ),
+                  // Create a bar for each day
                   barGroups: List.generate(weeklyData.length, (index) {
                     return BarChartGroupData(
                       x: index,
@@ -160,8 +171,8 @@ class _ProgressScreenState extends State<ProgressScreen> {
                         BarChartRodData(
                           toY: weeklyData[index].toDouble(),
                           color: weeklyData[index] == 1
-                              ? const Color.fromARGB(255, 175, 76, 175)
-                              : Colors.redAccent,
+                              ? const Color.fromARGB(255, 175, 76, 175) // completed
+                              : Colors.redAccent, // not completed
                           width: 18,
                           borderRadius: BorderRadius.circular(4),
                         ),
@@ -174,15 +185,14 @@ class _ProgressScreenState extends State<ProgressScreen> {
 
             const SizedBox(height: 30),
 
+            // Current Streak Section
             const Text(
               "Your Current Streak",
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
             Card(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               color: Colors.blue.shade50,
               child: ListTile(
                 leading: const Icon(Icons.local_fire_department,
@@ -197,11 +207,14 @@ class _ProgressScreenState extends State<ProgressScreen> {
 
             const SizedBox(height: 30),
 
+            // Upcoming Goals Section Title
             const Text(
               "Upcoming Goals",
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
+
+            // List of upcoming goals
             Expanded(
               child: ListView(
                 children: upcomingGoals.map((goal) {

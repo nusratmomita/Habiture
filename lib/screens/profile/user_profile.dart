@@ -11,17 +11,18 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  String? _gender;
-  bool _isLoading = false;
+  final _formKey = GlobalKey<FormState>(); // For form validation
+  final _nameController = TextEditingController(); // Controller for name input
+  String? _gender; // Stores selected gender
+  bool _isLoading = false; // Tracks loading state for save button
 
   @override
   void initState() {
     super.initState();
-    _loadUserData();
+    _loadUserData(); // Load existing user data from Firestore on screen open
   }
 
+  // Fetch user data from Firestore and populate fields
   Future<void> _loadUserData() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final user = authProvider.currentUser;
@@ -34,15 +35,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       if (doc.exists) {
         setState(() {
-          _nameController.text = doc['displayName'] ?? '';
-          _gender = doc['gender'] ?? '';
+          _nameController.text = doc['displayName'] ?? ''; // Prefill name
+          _gender = doc['gender'] ?? ''; // Prefill gender
         });
       }
     }
   }
 
+  // Save updated profile info to Firestore
   Future<void> _updateProfile() async {
-    if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate()) return; // Stop if invalid
 
     setState(() => _isLoading = true);
 
@@ -59,6 +61,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           'gender': _gender ?? '',
         });
 
+        // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text("Your profile updated successfully"),
@@ -67,6 +70,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         );
       }
     } catch (e) {
+      // Show error message
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Failed to update information. Please try again"),
@@ -75,46 +79,46 @@ class _ProfileScreenState extends State<ProfileScreen> {
       );
     }
 
-    setState(() => _isLoading = false);
+    setState(() => _isLoading = false); // Stop loading
   }
 
+  // Log the user out and navigate back to login screen
   Future<void> _logout() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     await authProvider.logout();
     if (mounted) {
       Navigator.pushNamedAndRemoveUntil(
           context,
-          '/login',
-              (route) => false
+          '/login', // go back to login screen
+          (route) => false // clear navigation stack
       );
     }
   }
 
   @override
   void dispose() {
-    _nameController.dispose();
+    _nameController.dispose(); // Clean up controller
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
-    final user = authProvider.currentUser;
+    final user = authProvider.currentUser; // Get current logged-in user
 
     return Scaffold(
-      appBar: AppBar(
-      ),
+      appBar: AppBar(), // Simple app bar
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: user == null
-            ? const Center(child: Text("No user data available"))
+            ? const Center(child: Text("No user data available")) // If no user
             : SingleChildScrollView(
           child: Form(
-            key: _formKey,
+            key: _formKey, // Attach form validation
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Profile Header
+                // Profile Header with icon
                 const SizedBox(height: 20),
                 const CircleAvatar(
                   radius: 50,
@@ -138,7 +142,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 const SizedBox(height: 30),
 
-                // Name
+                // Editable Display Name field
                 TextFormField(
                   controller: _nameController,
                   decoration: InputDecoration(
@@ -150,14 +154,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return "Kindly put a name";
+                      return "Kindly put a name"; // Require name
                     }
                     return null;
                   },
                 ),
                 const SizedBox(height: 20),
 
-                // Email (read-only)
+                // Non-editable Email field
                 TextFormField(
                   initialValue: user.email ?? '',
                   readOnly: true,
@@ -171,7 +175,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 const SizedBox(height: 20),
 
-                // Gender
+                // Gender dropdown selection
                 DropdownButtonFormField<String>(
                   value: _gender,
                   items: const [
@@ -209,9 +213,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                    onPressed: _isLoading ? null : _updateProfile,
+                    onPressed: _isLoading ? null : _updateProfile, // disable when loading
                     child: _isLoading
-                        ? const CircularProgressIndicator(
+                        ? const CircularProgressIndicator( // show loader while saving
                       color: Colors.white,
                     )
                         : const Text(
@@ -237,24 +241,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     onPressed: _logout,
                     child: Row(
-  mainAxisSize: MainAxisSize.min,
-  children: const [
-    Icon(
-      Icons.logout,
-      color: Colors.red,
-      size: 20,
-    ),
-    SizedBox(width: 8),
-    Text(
-      "Logout",
-      style: TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.bold,
-        color: Color.fromARGB(255, 123, 1, 91),
-      ),
-    ),
-  ],
-),
+                      mainAxisSize: MainAxisSize.min,
+                      children: const [
+                        Icon(
+                          Icons.logout,
+                          color: Colors.red,
+                          size: 20,
+                        ),
+                        SizedBox(width: 8),
+                        Text(
+                          "Logout",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Color.fromARGB(255, 123, 1, 91),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],

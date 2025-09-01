@@ -12,28 +12,30 @@ class CategoriesScreen extends StatefulWidget {
 }
 
 class _CategoriesScreenState extends State<CategoriesScreen> {
-  String? _tappedCategory;
+  String? _tappedCategory; // Tracks which category is currently tapped
 
+  // Called when a category card is tapped
   void _onCategoryTap(String category) async {
     final quotesProvider = Provider.of<QuotesProvider>(context, listen: false);
 
+    // Update UI to show tapped state
     setState(() {
       _tappedCategory = category;
     });
 
-    // Load quotes first
+    // Load quotes for the selected category
     await quotesProvider.loadQuotesByCategory(category);
 
-    if (!mounted) return;
+    if (!mounted) return; // Ensure widget is still in the tree
 
-    // Navigate after loading is complete
+    // Navigate to QuotesCategoryScreen after loading
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (_) => QuotesCategoryScreen(category: category),
       ),
     ).then((_) {
-      // Reset the tapped category after returning from the quotes screen
+      // Reset tapped category after returning from quotes screen
       if (mounted) {
         setState(() {
           _tappedCategory = null;
@@ -52,22 +54,24 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
         backgroundColor: Colors.deepPurple.shade700,
       ),
       body: quotesProvider.categories.isEmpty
+          // Show loader if categories are still loading
           ? const Center(child: CircularProgressIndicator())
           : GridView.builder(
         padding: const EdgeInsets.all(16),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
-          childAspectRatio: 1.2,
+          crossAxisCount: 2, // 2 cards per row
+          crossAxisSpacing: 16, // spacing between columns
+          mainAxisSpacing: 16, // spacing between rows
+          childAspectRatio: 1.2, // card height/width ratio
         ),
         itemCount: quotesProvider.categories.length,
         itemBuilder: (context, index) {
           final category = quotesProvider.categories[index];
+
           return CategoryCard(
             category: category,
-            isSelected: _tappedCategory == category,
-            onTap: () => _onCategoryTap(category),
+            isSelected: _tappedCategory == category, // highlight tapped card
+            onTap: () => _onCategoryTap(category), // handle tap
           );
         },
       ),

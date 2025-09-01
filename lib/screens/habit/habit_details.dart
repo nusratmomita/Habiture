@@ -1,7 +1,7 @@
 // showing details of a single habit 
 import 'package:flutter/material.dart';
 import '../../models/habit.dart';
-import '../../providers/habit_provider.dart';
+// import '../../providers/habit_provider.dart';
 import 'calendar_tracking.dart';
 import 'habit_statistic.dart';
 

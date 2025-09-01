@@ -1,26 +1,14 @@
 final Map<String, List<String>> localQuotes = {
   "Motivation": [
-    "Your actions today write the story of your tomorrow.",
-    "Energy flows where your focus goes.",
-    "Momentum builds when you take the first small step.",
-    "Success starts with showing up every single day.",
-    "Great journeys begin with consistent small strides.",
     "Keep moving — even a slow pace beats standing still.",
     "Every effort compounds, whether you notice it or not.",
     "Motivation fades, but discipline carries you forward.",
-    "Start before you feel ready.",
     "The gap between who you are and who you want to be is closed by habits."
   ],
   "Discipline": [
-    "Discipline is doing what needs to be done, even when you don’t feel like it.",
-    "Routine builds resilience; chaos breeds regret.",
-    "Your discipline today becomes your freedom tomorrow.",
-    "Discipline is self-respect in action.",
-    "Comfort whispers excuses, discipline delivers results.",
     "The strongest muscle is trained through consistency.",
     "Discipline is the silent agreement between who you are and who you want to become.",
     "Every decision strengthens or weakens your discipline muscle.",
-    "Discipline means choosing progress over impulses.",
     "Freedom without discipline is wasted potential."
   ],
   "Success": [
@@ -28,23 +16,11 @@ final Map<String, List<String>> localQuotes = {
     "Habits plant the seeds; success grows in their shade.",
     "Success is the reward of ordinary people with extraordinary consistency.",
     "There is no finish line, only the next level of growth.",
-    "Success is earned in silence and celebrated in echoes.",
-    "Tiny wins create unstoppable momentum.",
-    "Success is persistence dressed in patience.",
-    "What looks like luck is often discipline in disguise.",
-    "Success belongs to those who act when motivation fades.",
-    "Your habits forecast your success more than your goals do."
   ],
   "Habits": [
     "Habits shape destiny more than intentions ever could.",
     "Your future is hidden in your daily choices.",
     "Habits are votes for the person you wish to become.",
-    "Stack small habits and they will lift you to greatness.",
-    "Habits are invisible architects of your life.",
-    "Identity grows from repeated actions, not occasional effort.",
-    "Habits are the seeds; character is the harvest.",
-    "What you practice, you perfect — good or bad.",
-    "Habits turn discipline into second nature.",
     "You don’t decide your future, you decide your habits — and your habits decide your future."
   ],
   "Growth": [
@@ -52,32 +28,14 @@ final Map<String, List<String>> localQuotes = {
     "A challenge accepted is a growth earned.",
     "Growth is uncomfortable because it demands change.",
     "You cannot climb new heights with old habits.",
-    "Growth is not found in speed but in persistence.",
-    "Failure is fertilizer for growth.",
-    "Each struggle stretches you into a stronger version of yourself.",
-    "Growth requires courage to let go of the familiar.",
-    "Choose progress over perfection — that’s true growth.",
-    "Growth is the reward for consistent effort, not occasional leaps."
   ],
   "Wisdom": [
-    "Wisdom is knowing when to act and when to wait.",
-    "True wisdom is measured in perspective, not words.",
-    "Wisdom whispers where knowledge shouts.",
-    "Learning gives knowledge, reflection gives wisdom.",
-    "Wisdom grows in silence, not in noise.",
-    "A wise mind sees value in both success and failure.",
     "Patience is often the deepest form of wisdom.",
     "Wisdom begins when ego ends.",
     "The wise learn not just from answers but from better questions.",
     "Wisdom is living the lesson, not just knowing it."
   ],
   "Mindfulness": [
-    "Mindfulness is catching life in real time.",
-    "Peace is found in the breath between thoughts.",
-    "Mindfulness means noticing the small miracles of ordinary moments.",
-    "Stillness is not the absence of movement but the presence of awareness.",
-    "Breathe as if each breath is your first and your last.",
-    "Mindfulness is not about doing more, but being fully here.",
     "Each mindful step is a victory over distraction.",
     "Happiness lives in the now, not in the next.",
     "The present moment is the only teacher you truly have.",
