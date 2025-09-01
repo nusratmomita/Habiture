@@ -21,10 +21,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _obscurePassword = true;
 
   Future<void> _register() async {
-    if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please fix the errors in the form.'),
+          duration: Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
     if (!_termsAccepted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('You must accept the terms & conditions')),
+        const SnackBar(
+          content: Text('You must accept the terms & conditions'),
+          duration: Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+        ),
       );
       return;
     }
@@ -45,232 +59,272 @@ class _RegisterScreenState extends State<RegisterScreen> {
       Navigator.pushReplacementNamed(context, '/home');
     } else if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(error ?? 'Registration failed')),
+        SnackBar(
+          content: Text(error ?? 'Registration failed. Please try again'),
+          duration: const Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+        ),
       );
     }
   }
 
+  InputDecoration inputDecoration({
+    required String label,
+    Widget? prefixIcon,
+    Widget? suffixIcon,
+    String? helperText,
+  }) {
+    return InputDecoration(
+      labelText: label,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      prefixIcon: prefixIcon,
+      suffixIcon: suffixIcon,
+      filled: true,
+      fillColor: Colors.purple[50],
+      contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 18),
+      helperText: helperText,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final primaryColor = Colors.deepPurple;
+
     return Scaffold(
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24.0),
+            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40),
             child: Form(
               key: _formKey,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Welcome message
+                  const SizedBox(height: 40),
                   Text(
-                    "Welcome To",
+                    "Welcome To Habiture",
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
-                      color: Theme.of(context).primaryColor,
+                      color: primaryColor,
                     ),
                   ),
                   const SizedBox(height: 20),
-
-                  // Logo
-                  const CircleAvatar(
-                    radius: 60,
-                    backgroundColor: Colors.transparent,
-                    backgroundImage: AssetImage('assets/logo.png'),
-                  ),
-                  const SizedBox(height: 30),
-
-                  // Title
                   Text(
                     "Create Account",
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: Theme.of(context).primaryColor,
+                      color: primaryColor,
                     ),
                   ),
                   const SizedBox(height: 30),
 
                   // Name Field
-                  TextFormField(
-                    controller: _nameController,
-                    decoration: InputDecoration(
-                      labelText: "Full Name*",
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
+                  SizedBox(
+                    width: 350,
+                    child: TextFormField(
+                      controller: _nameController,
+                      decoration: inputDecoration(
+                        label: "Full Name*",
+                        prefixIcon: const Icon(Icons.person, color: Colors.deepPurple),
                       ),
-                      prefixIcon: const Icon(Icons.person),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your name';
+                        }
+                        return null;
+                      },
+                      style: const TextStyle(fontSize: 18),
                     ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your name';
-                      }
-                      return null;
-                    },
                   ),
                   const SizedBox(height: 16),
 
                   // Email Field
-                  TextFormField(
-                    controller: _emailController,
-                    decoration: InputDecoration(
-                      labelText: "Email*",
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
+                  SizedBox(
+                    width: 350,
+                    child: TextFormField(
+                      controller: _emailController,
+                      decoration: inputDecoration(
+                        label: "Email*",
+                        prefixIcon: const Icon(Icons.email, color: Colors.deepPurple),
                       ),
-                      prefixIcon: const Icon(Icons.email),
+                      keyboardType: TextInputType.emailAddress,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your email';
+                        }
+                        if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                            .hasMatch(value)) {
+                          return 'Please enter a valid email';
+                        }
+                        return null;
+                      },
+                      style: const TextStyle(fontSize: 18),
                     ),
-                    keyboardType: TextInputType.emailAddress,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your email';
-                      }
-                      if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                          .hasMatch(value)) {
-                        return 'Please enter a valid email';
-                      }
-                      return null;
-                    },
                   ),
                   const SizedBox(height: 16),
 
                   // Password Field
-                  TextFormField(
-                    controller: _passwordController,
-                    decoration: InputDecoration(
-                      labelText: "Password*",
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      prefixIcon: const Icon(Icons.lock),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _obscurePassword
-                              ? Icons.visibility
-                              : Icons.visibility_off,
+                  SizedBox(
+                    width: 350,
+                    child: TextFormField(
+                      controller: _passwordController,
+                      obscureText: _obscurePassword,
+                      decoration: inputDecoration(
+                        label: "Password*",
+                        prefixIcon: const Icon(Icons.lock, color: Colors.deepPurple),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscurePassword
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                            color: Colors.deepPurple,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _obscurePassword = !_obscurePassword;
+                            });
+                          },
                         ),
-                        onPressed: () {
-                          setState(() {
-                            _obscurePassword = !_obscurePassword;
-                          });
-                        },
+                        helperText: 'Min 8 chars, include upper/lowercase & numbers',
                       ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter a password';
+                        }
+                        if (value.length < 8) {
+                          return 'Password must be at least 8 characters';
+                        }
+                        if (!RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$')
+                            .hasMatch(value)) {
+                          return 'Must include uppercase, lowercase & numbers';
+                        }
+                        return null;
+                      },
+                      style: const TextStyle(fontSize: 18),
                     ),
-                    obscureText: _obscurePassword,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter a password';
-                      }
-                      if (value.length < 8) {
-                        return 'Password must be at least 8 characters';
-                      }
-                      if (!RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$')
-                          .hasMatch(value)) {
-                        return 'Must include uppercase, lowercase and numbers';
-                      }
-                      return null;
-                    },
                   ),
                   const SizedBox(height: 16),
 
                   // Gender Dropdown
-                  DropdownButtonFormField<String>(
-                    value: _selectedGender,
-                    decoration: InputDecoration(
-                      labelText: "Gender",
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
+                  SizedBox(
+                    width: 350,
+                    child: DropdownButtonFormField<String>(
+                      value: _selectedGender,
+                      decoration: inputDecoration(
+                        label: "Gender",
+                        prefixIcon: const Icon(Icons.person_outline, color: Colors.deepPurple),
                       ),
-                      prefixIcon: const Icon(Icons.person_outline),
-                    ),
-                    items: const [
-                      DropdownMenuItem(
-                        value: null,
-                        child: Text('Select Gender (Optional)'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'Male',
-                        child: Text('Male'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'Female',
-                        child: Text('Female'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'Other',
-                        child: Text('Other'),
-                      ),
-                    ],
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedGender = value;
-                      });
-                    },
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Terms & Conditions
-                  Row(
-                    children: [
-                      Checkbox(
-                        value: _termsAccepted,
-                        onChanged: (value) {
-                          setState(() {
-                            _termsAccepted = value ?? false;
-                          });
-                        },
-                      ),
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () {
-                            // Add navigation to terms & conditions screen
-                          },
-                          child: Text.rich(
-                            TextSpan(
-                              text: 'I agree to the ',
-                              children: [
-                                TextSpan(
-                                  text: 'Terms & Conditions*',
-                                  style: TextStyle(
-                                    color: Theme.of(context).primaryColor,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
+                      items: [
+                        DropdownMenuItem(
+                          value: null,
+                          child: Row(
+                            children: const [
+                              Icon(Icons.help_outline, color: Colors.grey),
+                              SizedBox(width: 8),
+                              Text('Select Gender (Optional)'),
+                            ],
                           ),
                         ),
+                        DropdownMenuItem(
+                          value: 'Male',
+                          child: Row(
+                            children: const [
+                              Icon(Icons.male, color: Colors.blue),
+                              SizedBox(width: 8),
+                              Text('Male'),
+                            ],
+                          ),
+                        ),
+                        DropdownMenuItem(
+                          value: 'Female',
+                          child: Row(
+                            children: const [
+                              Icon(Icons.female, color: Colors.pink),
+                              SizedBox(width: 8),
+                              Text('Female'),
+                            ],
+                          ),
+                        ),
+                      ],
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedGender = value;
+                        });
+                      },
+                      style: const TextStyle(fontSize: 18),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Terms & Conditions - Centered
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Checkbox(
+                            value: _termsAccepted,
+                            onChanged: (value) {
+                              setState(() {
+                                _termsAccepted = value ?? false;
+                              });
+                            },
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              // Navigate to terms & conditions
+                            },
+                            child: Text.rich(
+                              TextSpan(
+                                text: 'I agree to the ',
+                                children: [
+                                  TextSpan(
+                                    text: 'Terms & Conditions*',
+                                    style: TextStyle(
+                                      color: primaryColor,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
+                      // const Icon(Icons.info_outline, color: Colors.grey, size: 20),
                     ],
                   ),
                   const SizedBox(height: 24),
 
-                  // Register Button - Fixed to show text properly
+                  // Register Button
                   SizedBox(
-                    width: double.infinity,
-                    height: 50,
+                    width: 350,
+                    height: 55,
                     child: _isLoading
-                        ? const Center(
-                      child: CircularProgressIndicator(),
-                    )
+                        ? const Center(child: CircularProgressIndicator())
                         : ElevatedButton(
-                      onPressed: _register,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Theme.of(context).primaryColor,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: const Text(
-                        'REGISTER',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
+                            onPressed: _register,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: primaryColor,
+                              elevation: 4,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                            ),
+                            child: const Text(
+                              'Register',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
                   ),
                   const SizedBox(height: 20),
 
@@ -286,7 +340,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           TextSpan(
                             text: 'Login',
                             style: TextStyle(
-                              color: Theme.of(context).primaryColor,
+                              color: primaryColor,
                               fontWeight: FontWeight.bold,
                             ),
                           ),

@@ -15,6 +15,17 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
 
   Future<void> _login() async {
+    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter both email and password'),
+          duration: Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     setState(() => _isLoading = true);
 
@@ -32,7 +43,11 @@ class _LoginScreenState extends State<LoginScreen> {
     } else {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(error)),
+          SnackBar(
+            content: Text(error),
+            duration: const Duration(seconds: 2),
+            behavior: SnackBarBehavior.floating,
+          ),
         );
       }
     }
@@ -40,103 +55,108 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final primaryColor = Colors.deepPurple;
+
     return Scaffold(
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24.0),
+            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 50),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 // Welcome back text
                 Text(
-                  "Welcome back",
+                  "Welcome back!",
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    color: const Color(0xFF4CAF50), // Green color
+                    color: primaryColor,
                   ),
                 ),
                 const SizedBox(height: 20),
 
-                // Larger Application Logo
+                // Logo (optional: uncomment if needed)
                 // const CircleAvatar(
-                //   radius: 80, // Increased from 60
+                //   radius: 80,
                 //   backgroundColor: Colors.transparent,
                 //   backgroundImage: AssetImage('assets/logo.png'),
                 // ),
                 const SizedBox(height: 40),
 
-                // Larger Email Input Field
+                // Email Field
                 SizedBox(
-                  width: 350, // Increased from 300
+                  width: 350,
                   child: TextField(
                     controller: _emailController,
                     decoration: InputDecoration(
                       labelText: "Email",
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12), // Slightly more rounded
+                        borderRadius: BorderRadius.circular(16),
                       ),
-                      prefixIcon: const Icon(Icons.email, size: 24), // Larger icon
-                      contentPadding: const EdgeInsets.symmetric(
-                          vertical: 18, horizontal: 18), // Increased padding
+                      prefixIcon: Icon(Icons.email, size: 26, color: primaryColor),
+                      filled: true,
+                      fillColor: Colors.purple[50],
+                      contentPadding:
+                          const EdgeInsets.symmetric(vertical: 20, horizontal: 18),
                     ),
                     keyboardType: TextInputType.emailAddress,
-                    style: const TextStyle(fontSize: 18), // Larger text
+                    style: const TextStyle(fontSize: 18),
                   ),
                 ),
                 const SizedBox(height: 24),
 
-                // Larger Password Input Field
+                // Password Field
                 SizedBox(
-                  width: 350, // Increased from 300
+                  width: 350,
                   child: TextField(
                     controller: _passwordController,
+                    obscureText: true,
                     decoration: InputDecoration(
                       labelText: "Password",
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(16),
                       ),
-                      prefixIcon: const Icon(Icons.lock, size: 24), // Larger icon
-                      contentPadding: const EdgeInsets.symmetric(
-                          vertical: 18, horizontal: 18),
+                      prefixIcon: Icon(Icons.lock, size: 26, color: primaryColor),
+                      filled: true,
+                      fillColor: Colors.purple[50],
+                      contentPadding:
+                          const EdgeInsets.symmetric(vertical: 20, horizontal: 18),
                     ),
-                    obscureText: true,
-                    style: const TextStyle(fontSize: 18), // Larger text
+                    style: const TextStyle(fontSize: 18),
                   ),
                 ),
                 const SizedBox(height: 32),
 
-                // Larger Login Button
+                // Login Button
                 SizedBox(
-                  width: 350, // Increased from 300
-                  height: 60, // Increased from 50
+                  width: 350,
+                  height: 60,
                   child: _isLoading
                       ? const Center(
-                    child: CircularProgressIndicator(
-                      strokeWidth: 3,
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                          Color(0xFF4CAF50)),
-                    ),
-                  )
+                          child: CircularProgressIndicator(
+                          strokeWidth: 3,
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.deepPurple),
+                        ))
                       : ElevatedButton(
-                    onPressed: _login,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF4CAF50), // Green color
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      elevation: 5,
-                    ),
-                    child: const Text(
-                      "LOGIN",
-                      style: TextStyle(
-                        fontSize: 18, // Larger text
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
+                          onPressed: _login,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: primaryColor,
+                            elevation: 6,
+                            shadowColor: primaryColor.withOpacity(0.4),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          ),
+                          child: const Text(
+                            "LOGIN",
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
                 ),
                 const SizedBox(height: 24),
 
@@ -148,13 +168,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Text.rich(
                     TextSpan(
                       text: "Don't have an account? ",
-                      style: const TextStyle(
-                          color: Colors.grey, fontSize: 16), // Slightly larger
+                      style: const TextStyle(color: Colors.grey, fontSize: 16),
                       children: [
                         TextSpan(
                           text: "Register",
                           style: TextStyle(
-                            color: const Color(0xFF4CAF50), // Green color
+                            color: primaryColor,
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
                           ),
