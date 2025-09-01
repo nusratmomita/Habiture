@@ -4,7 +4,7 @@ class HabitModel {
   final String id;
   final String title;
   final String description;
-  final String frequency;
+  final String frequency;// everyday or sometimes
   final DateTime createdAt;
   final List<DateTime> completedDates;
 
@@ -16,37 +16,41 @@ class HabitModel {
     required this.createdAt,
     required this.completedDates,
   });
-
-  factory HabitModel.fromMap(Map<String, dynamic> data, String documentId) {
+ 
+ // reading data from firebase
+  factory HabitModel.fromMap(Map<String, dynamic> habit, String documentId) {
     return HabitModel(
       id: documentId,
-      title: data['title'] ?? '',
-      description: data['description'] ?? '',
-      frequency: data['frequency'] ?? 'day',
-      createdAt: (data['createdAt'] is Timestamp)
-          ? (data['createdAt'] as Timestamp).toDate()
+      title: habit['title'] ?? '',
+      description: habit['description'] ?? '',
+      frequency: habit['frequency'] ?? 'day',
+      createdAt: (habit['createdAt'] is Timestamp)
+          ? (habit['createdAt'] as Timestamp).toDate()
           : DateTime.now(),
-      completedDates: (data['completedDates'] as List<dynamic>?)
+      completedDates: (habit['completedDates'] as List<dynamic>?)
           ?.map((e) => e is Timestamp ? e.toDate() : DateTime.tryParse(e.toString())!)
           .toList() ?? [],
     );
   }
 
+  // FS does not store Dart DateTime objects directly.
+  // Instead FS stores dates as a special type called Timestamp
   Map<String, dynamic> toMap() {
     return {
       'title': title,
       'description': description,
       'frequency': frequency,
-      'createdAt': Timestamp.fromDate(createdAt),
+      'createdAt': Timestamp.fromDate(createdAt),// getting the current date and time of a habit
       'completedDates': completedDates.map((e) => Timestamp.fromDate(e)).toList(),
     };
   }
 
+  // calculating streak
   int get currentStreak {
-    if (completedDates.isEmpty) return 0;
+    if (completedDates.isEmpty) return 0;// not continued
 
     final sortedDates = List<DateTime>.from(completedDates)
-      ..sort((a, b) => b.compareTo(a));
+      ..sort((a, b) => a.compareTo(b));
 
     int streak = 0;
     DateTime current = DateTime.now();
@@ -89,7 +93,7 @@ class HabitModel {
     if (completedDates.isEmpty) return [];
 
     final sortedDates = List<DateTime>.from(completedDates)
-      ..sort((a, b) => b.compareTo(a));
+      ..sort((a, b) => a.compareTo(b));
 
     final streak = <DateTime>[];
     DateTime current = DateTime.now();

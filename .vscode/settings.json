@@ -3,5 +3,6 @@
         "activityBar.background": "#5E0B1E",
         "titleBar.activeBackground": "#830F2A",
         "titleBar.activeForeground": "#FFFBFC"
-    }
+    },
+    "cmake.sourceDirectory": "C:/Users/User/OneDrive/Desktop/App Development/habiture/linux/runner"
 }
