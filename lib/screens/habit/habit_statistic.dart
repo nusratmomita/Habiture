@@ -34,7 +34,7 @@ class HabitStatisticsTab extends StatelessWidget {
                 'Current Streak',
                 '${habit.currentStreak} days',
                 Icons.local_fire_department,
-                Colors.orange,
+                const Color.fromARGB(255, 255, 0, 157),
                 theme,
               ),
               const SizedBox(width: 16),
@@ -42,7 +42,7 @@ class HabitStatisticsTab extends StatelessWidget {
                 'Longest Streak',
                 '${habit.longestStreak} days',
                 Icons.timeline,
-                Colors.green,
+                Colors.purple,
                 theme,
               ),
             ],
@@ -52,7 +52,7 @@ class HabitStatisticsTab extends StatelessWidget {
             'Weekly Completion',
             '${habit.completionPercentage.toStringAsFixed(0)}%',
             Icons.check_circle,
-            Colors.blue,
+            const Color.fromARGB(255, 243, 33, 121),
             theme,
             fullWidth: true,
           ),
@@ -74,20 +74,18 @@ class HabitStatisticsTab extends StatelessWidget {
   }
 
   Widget _buildStatCard(
-      String title,
-      String value,
-      IconData icon,
-      Color iconColor,
-      ThemeData theme, {
-        bool fullWidth = false,
-      }) {
+    String title,
+    String value,
+    IconData icon,
+    Color iconColor,
+    ThemeData theme, {
+    bool fullWidth = false,
+  }) {
     return SizedBox(
       width: fullWidth ? double.infinity : null,
       child: Card(
         elevation: 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -134,7 +132,15 @@ class HabitStatisticsTab extends StatelessWidget {
               tooltipPadding: const EdgeInsets.all(8),
               getTooltipColor: (group) => theme.colorScheme.surface,
               getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                final dayName = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][group.x.toInt()];
+                final dayName = [
+                  'Sun',
+                  'Mon',
+                  'Tue',
+                  'Wed',
+                  'Thu',
+                  'Fri',
+                  'Sat',
+                ][group.x.toInt()];
                 return BarTooltipItem(
                   '${dayName}\n${rod.toY == 1 ? 'Completed' : 'Not completed'}',
                   TextStyle(
@@ -170,10 +176,7 @@ class HabitStatisticsTab extends StatelessWidget {
                   width: 22,
                   borderRadius: BorderRadius.circular(6),
                   borderSide: isToday
-                      ? BorderSide(
-                    color: theme.colorScheme.secondary,
-                    width: 2,
-                  )
+                      ? BorderSide(color: theme.colorScheme.secondary, width: 2)
                       : BorderSide.none,
                   backDrawRodData: BackgroundBarChartRodData(
                     show: true,
@@ -238,10 +241,7 @@ class HabitStatisticsTab extends StatelessWidget {
           borderData: FlBorderData(
             show: true,
             border: Border(
-              bottom: BorderSide(
-                color: theme.dividerColor,
-                width: 1,
-              ),
+              bottom: BorderSide(color: theme.dividerColor, width: 1),
             ),
           ),
         ),
@@ -279,7 +279,10 @@ class HabitStatisticsTab extends StatelessWidget {
             LineChartBarData(
               spots: data
                   .asMap()
-                  .map((index, value) => MapEntry(index, FlSpot(index.toDouble(), value)))
+                  .map(
+                    (index, value) =>
+                        MapEntry(index, FlSpot(index.toDouble(), value)),
+                  )
                   .values
                   .toList(),
               isCurved: true,
@@ -333,10 +336,7 @@ class HabitStatisticsTab extends StatelessWidget {
           borderData: FlBorderData(
             show: true,
             border: Border(
-              bottom: BorderSide(
-                color: theme.dividerColor,
-                width: 1,
-              ),
+              bottom: BorderSide(color: theme.dividerColor, width: 1),
             ),
           ),
           gridData: FlGridData(
@@ -354,16 +354,19 @@ class HabitStatisticsTab extends StatelessWidget {
     );
   }
 
-
   List<double> _generateWeeklyData() {
     final now = DateTime.now();
     final weekStart = now.subtract(Duration(days: now.weekday));
     return List.generate(7, (index) {
       final date = weekStart.add(Duration(days: index));
-      return habit.completedDates.any((d) =>
-      d.year == date.year &&
-          d.month == date.month &&
-          d.day == date.day) ? 1.0 : 0.0;
+      return habit.completedDates.any(
+            (d) =>
+                d.year == date.year &&
+                d.month == date.month &&
+                d.day == date.day,
+          )
+          ? 1.0
+          : 0.0;
     });
   }
 
@@ -375,10 +378,10 @@ class HabitStatisticsTab extends StatelessWidget {
 
       for (int i = 0; i < 7; i++) {
         final date = weekStart.add(Duration(days: i));
-        if (habit.completedDates.any((d) =>
-        d.year == date.year &&
-            d.month == date.month &&
-            d.day == date.day)) {
+        if (habit.completedDates.any(
+          (d) =>
+              d.year == date.year && d.month == date.month && d.day == date.day,
+        )) {
           streak++;
         } else {
           break;

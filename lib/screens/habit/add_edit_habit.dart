@@ -1,12 +1,9 @@
-// users create a new habit or edit an existing habit
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../models/habit.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/habit_provider.dart';
-// import '../../services/firestore_service.dart';
 
-// Accepts optional values → if provided, the screen is in edit mode; if not, it’s add mode
 class AddEditHabitScreen extends StatefulWidget {
   final String? habitId;
   final String? existingTitle;
@@ -25,25 +22,22 @@ class AddEditHabitScreen extends StatefulWidget {
   _AddEditHabitScreenState createState() => _AddEditHabitScreenState();
 }
 
-// a form to add new habit
 class _AddEditHabitScreenState extends State<AddEditHabitScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _titleController = TextEditingController();// Form validation is handled with _formKey
-  final _descriptionController = TextEditingController();// manage habit title & description. 
-  String _selectedFrequency = 'daily';//  dropdown for choosing daily/weekly/monthly.
+  final _titleController = TextEditingController();
+  final _descriptionController = TextEditingController();
+  String _selectedFrequency = 'daily';
   bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    // If editing, pre-fills text fields with existing values.
     if (widget.habitId != null) {
       _titleController.text = widget.existingTitle ?? '';
       _descriptionController.text = widget.existingDescription ?? '';
     }
   }
 
- // Disposes controllers when screen is destroyed.
   @override
   void dispose() {
     _titleController.dispose();
@@ -51,7 +45,6 @@ class _AddEditHabitScreenState extends State<AddEditHabitScreen> {
     super.dispose();
   }
 
-  // Saving Habit
   Future<void> _saveHabit() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -63,7 +56,7 @@ class _AddEditHabitScreenState extends State<AddEditHabitScreen> {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       final userId = authProvider.currentUser?.uid;
 
-      if(userId == null) {
+      if (userId == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("No User Found")),
         );
@@ -84,14 +77,12 @@ class _AddEditHabitScreenState extends State<AddEditHabitScreen> {
       await Provider.of<HabitProvider>(context, listen: false)
           .addOrUpdateHabit(habit);
 
-      Navigator.pop(context);// After saving, goes back (Navigator.pop).
-    } 
-    catch (e) {
+      Navigator.pop(context);
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Can't save habit. Found an error: $e")),
       );
-    } 
-    finally {
+    } finally {
       if (mounted) {
         setState(() {
           _isLoading = false;
@@ -100,7 +91,6 @@ class _AddEditHabitScreenState extends State<AddEditHabitScreen> {
     }
   }
 
-  // Deleting Habit
   Future<void> _deleteHabit() async {
     if (widget.habitId == null) return;
 
@@ -114,7 +104,7 @@ class _AddEditHabitScreenState extends State<AddEditHabitScreen> {
 
       if (userId != null) {
         await Provider.of<HabitProvider>(context, listen: false)
-            .deleteHabit(widget.habitId!);// Deletes habit by ID through HabitProvider.
+            .deleteHabit(widget.habitId!);
       }
 
       Navigator.pop(context);
@@ -137,79 +127,117 @@ class _AddEditHabitScreenState extends State<AddEditHabitScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(isEditing ? "Edit Habit" : "Add Habit"),
+        elevation: 0,
+        backgroundColor: Colors.purple,
+        title: Text(
+          isEditing ? "Edit Habit" : "Add Habit",
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true,
         actions: [
           if (isEditing)
             IconButton(
-              icon: const Icon(Icons.delete),
+              icon: const Icon(Icons.delete_forever, color: Colors.redAccent),
+              tooltip: "Delete Habit",
               onPressed: _deleteHabit,
             ),
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20.0),
         child: _isLoading
             ? const Center(child: CircularProgressIndicator())
             : Form(
-          key: _formKey,
-          child: ListView(
-            children: [
-              TextFormField(
-                controller: _titleController,
-                decoration: InputDecoration(
-                    labelText: "Habit Name",
-                    filled: true,
-                    border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+                key: _formKey,
+                child: ListView(
+                  children: [
+                    TextFormField(
+                      controller: _titleController,
+                      decoration: InputDecoration(
+                        labelText: "Habit Name",
+                        prefixIcon: const Icon(Icons.task_alt),
+                        filled: true,
+                        fillColor: Colors.grey.shade100,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return "Please enter a title";
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _descriptionController,
+                      decoration: InputDecoration(
+                        labelText: "Habit Description",
+                        prefixIcon: const Icon(Icons.description_outlined),
+                        filled: true,
+                        fillColor: Colors.grey.shade100,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                      maxLines: 3,
+                    ),
+                    const SizedBox(height: 16),
+                    DropdownButtonFormField<String>(
+                      value: _selectedFrequency,
+                      items: ['daily', 'weekly', 'monthly']
+                          .map((frequency) => DropdownMenuItem(
+                                value: frequency,
+                                child: Text(frequency[0].toUpperCase() +
+                                    frequency.substring(1)),
+                              ))
+                          .toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedFrequency = value!;
+                        });
+                      },
+                      decoration: InputDecoration(
+                        labelText: 'Frequency',
+                        prefixIcon: const Icon(Icons.repeat),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        filled: true,
+                        fillColor: Colors.grey.shade100,
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton.icon(
+                        onPressed: _saveHabit,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color.fromARGB(255, 212, 175, 218),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                        icon: Icon(
+                          isEditing ? Icons.update : Icons.add,
+                          size: 22,
+                        ),
+                        label: Text(
+                          isEditing
+                              ? "Update Habit"
+                              : "Add New Habit",
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return "Please enter a title";
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _descriptionController,
-                decoration: InputDecoration(
-                  labelText: "Enter Habit Description",
-                  filled: true,
-                  border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-                maxLines: 3,
-              ),
-              const SizedBox(height: 16),
-              DropdownButtonFormField<String>(
-                value: _selectedFrequency,
-                items: ['daily', 'weekly', 'monthly']
-                    .map((frequency) => DropdownMenuItem(
-                  value: frequency,
-                  child: Text(frequency[0].toUpperCase() +
-                      frequency.substring(1)),
-                ))
-                    .toList(),
-                onChanged: (value) {
-                  setState(() {
-                    _selectedFrequency = value!;
-                  });
-                },
-                decoration: const InputDecoration(
-                  labelText: 'Add Frequency',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 32),
-              ElevatedButton(
-                onPressed: _saveHabit,
-                child: Text(isEditing ? "Update Already Exited Habit" : "Add A New Habit"),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

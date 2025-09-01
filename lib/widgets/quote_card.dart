@@ -20,9 +20,7 @@ class QuoteCard extends StatelessWidget {
     return Card(
       elevation: 3,
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
         onTap: () {},
@@ -58,7 +56,7 @@ class QuoteCard extends StatelessWidget {
                 children: [
                   // Share button
                   IconButton(
-                    icon: const Icon(Icons.share, color: Colors.green),
+                    icon: const Icon(Icons.share, color: Colors.purple),
                     tooltip: 'Share quote',
                     onPressed: () {
                       Share.share(
@@ -86,9 +84,11 @@ class QuoteCard extends StatelessWidget {
                   IconButton(
                     icon: Icon(
                       isFavorite ? Icons.favorite : Icons.favorite_border,
-                      color: Colors.redAccent,
+                      color: const Color.fromARGB(255, 255, 82, 192),
                     ),
-                    tooltip: isFavorite ? 'Remove from favorites' : 'Add to favorites',
+                    tooltip: isFavorite
+                        ? 'Remove from favorites'
+                        : 'Add to favorites',
                     onPressed: onFavoriteToggle,
                   ),
                 ],

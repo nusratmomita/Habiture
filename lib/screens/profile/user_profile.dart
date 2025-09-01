@@ -61,16 +61,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text("Profile updated successfully"),
-            backgroundColor: Color(0xFF4CAF50),
+            content: Text("Your profile updated successfully"),
+            backgroundColor: Color.fromARGB(255, 73, 24, 123),
           ),
         );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("Failed to update profile"),
-          backgroundColor: Colors.red,
+          content: Text("Failed to update information. Please try again"),
+          backgroundColor: Color.fromARGB(255, 179, 16, 114),
         ),
       );
     }
@@ -103,8 +103,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Profile"),
-        backgroundColor: const Color(0xFF4CAF50),
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -120,21 +118,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(height: 20),
                 const CircleAvatar(
                   radius: 50,
-                  backgroundColor: Color(0xFFE8F5E9),
+                  backgroundColor: Color.fromARGB(255, 205, 114, 244),
                   child: Icon(
                     Icons.person,
                     size: 50,
-                    color: Color(0xFF4CAF50),
+                    color: Color.fromARGB(255, 130, 4, 111),
                   ),
                 ),
                 const SizedBox(height: 20),
                 const Center(
                   child: Text(
-                    "Edit Profile",
+                    "Edit your profile",
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF4CAF50),
+                      color: Color.fromARGB(255, 92, 2, 74),
                     ),
                   ),
                 ),
@@ -144,7 +142,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 TextFormField(
                   controller: _nameController,
                   decoration: InputDecoration(
-                    labelText: "Display Name",
+                    labelText: "Display User Name",
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -152,7 +150,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return "Name cannot be empty";
+                      return "Kindly put a name";
                     }
                     return null;
                   },
@@ -164,7 +162,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   initialValue: user.email ?? '',
                   readOnly: true,
                   decoration: InputDecoration(
-                    labelText: "Email",
+                    labelText: "Email Address",
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -184,10 +182,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     DropdownMenuItem(
                       value: "Female",
                       child: Text("Female"),
-                    ),
-                    DropdownMenuItem(
-                      value: "Other",
-                      child: Text("Other"),
                     ),
                   ],
                   decoration: InputDecoration(
@@ -210,7 +204,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   height: 50,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF4CAF50),
+                      backgroundColor: const Color.fromARGB(255, 231, 189, 229),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
@@ -242,14 +236,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ),
                     onPressed: _logout,
-                    child: const Text(
-                      "Logout",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.red,
-                      ),
-                    ),
+                    child: Row(
+  mainAxisSize: MainAxisSize.min,
+  children: const [
+    Icon(
+      Icons.logout,
+      color: Colors.red,
+      size: 20,
+    ),
+    SizedBox(width: 8),
+    Text(
+      "Logout",
+      style: TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.bold,
+        color: Color.fromARGB(255, 123, 1, 91),
+      ),
+    ),
+  ],
+),
                   ),
                 ),
               ],

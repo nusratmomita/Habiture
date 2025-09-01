@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import '../providers/auth_provider.dart';
 import '../providers/habit_provider.dart';
 import '../providers/quote_provider.dart';
 import '../providers/theme_provider.dart';
@@ -9,6 +8,7 @@ import '../widgets/habit_card.dart';
 import 'profile/user_profile.dart';
 import 'progress/habit_progress.dart';
 import 'quotes/quote_showing.dart';
+import '../providers/auth_provider.dart' as my_auth; // <- Prefix to avoid conflict with Firebase
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -20,12 +20,13 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
   int _selectedIndex = 0;
   late List<Widget> _screens;
-  final Color appBarColor = const Color(0xFF4CAF50);
+  final Color appBarColor = Colors.purple; // Using purple palette
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final authProvider = Provider.of<my_auth.AuthProvider>(context, listen: false);
+    final userName = authProvider.currentUser?.displayName ?? 'User';
     final userId = authProvider.currentUser?.uid ?? '';
 
     _screens = [
@@ -39,7 +40,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Hi there!',
+                    Text('Hi, $userName!',
                         style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: Theme.of(context).colorScheme.onSurface)),
@@ -69,7 +70,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   Navigator.pushNamed(context, '/add_edit_habit');
                 },
                 backgroundColor: appBarColor,
-                child: const Icon(Icons.add, color: Colors.white),
+                child: const Icon(Icons.add, color: Colors.white, size: 28),
               ),
             );
           },
@@ -94,17 +95,51 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       elevation: 4,
+      color: Colors.purple[50],
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
-            Text('Why Our App?', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-            SizedBox(height: 5),
-            Text('- Track your habits efficiently'),
-            Text('- Daily motivational quotes'),
-            Text('- Monitor your progress visually'),
-            Text('- Personalized experience'),
+          children: [
+            Row(
+              children: const [
+                Icon(Icons.star, color: Colors.purple, size: 28),
+                SizedBox(width: 8),
+                Text('Why Choose Habiture?', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: const [
+                Icon(Icons.check_circle, color: Colors.purple, size: 20),
+                SizedBox(width: 8),
+                Expanded(child: Text('Track your habits efficiently')),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Row(
+              children: const [
+                Icon(Icons.lightbulb, color: Colors.purple, size: 20),
+                SizedBox(width: 8),
+                Expanded(child: Text('Get daily motivational quotes')),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Row(
+              children: const [
+                Icon(Icons.show_chart, color: Colors.purple, size: 20),
+                SizedBox(width: 8),
+                Expanded(child: Text('Monitor your progress visually')),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Row(
+              children: const [
+                Icon(Icons.person, color: Colors.purple, size: 20),
+                SizedBox(width: 8),
+                Expanded(child: Text('Enjoy a personalized experience')),
+              ],
+            ),
           ],
         ),
       ),
@@ -151,7 +186,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Habit Tracker', style: TextStyle(color: Colors.white)),
+        title: const Text('Habiture', style: TextStyle(color: Color.fromARGB(255, 255, 255, 255))),
         backgroundColor: appBarColor,
         iconTheme: const IconThemeData(color: Colors.white),
         actions: [
@@ -161,9 +196,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             tooltip: isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode',
           ),
           Padding(
-            padding: const EdgeInsets.only(right: 16),
+            padding: const EdgeInsets.only(right: 32),
             child: Center(
-              child: Text('Premium', style: TextStyle(color: Colors.amber[200])),
+              child: Text("Change theme" , style: TextStyle(color: Colors.white)),
             ),
           ),
         ],

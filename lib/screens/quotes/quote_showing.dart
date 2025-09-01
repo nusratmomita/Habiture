@@ -40,7 +40,7 @@ class _QuotesScreenState extends State<QuotesScreen> {
               icon: Badge(
                 isLabelVisible: provider.favorites.isNotEmpty,
                 label: Text(provider.favorites.length.toString()),
-                child: const Icon(Icons.favorite, color: Colors.red),
+                child: const Icon(Icons.favorite, color: Color.fromARGB(255, 244, 54, 181)),
               ),
               onPressed: () {
                 Navigator.push(

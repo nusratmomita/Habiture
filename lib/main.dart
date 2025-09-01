@@ -46,7 +46,7 @@ class MyApp extends StatelessWidget {
             ],
             child: MaterialApp(
               debugShowCheckedModeBanner: false,
-              title: 'Habit Tracker',
+              title: 'Habiture',
               theme: ThemeData.light(),
               darkTheme: ThemeData.dark(),
               themeMode: themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,

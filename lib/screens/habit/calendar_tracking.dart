@@ -16,13 +16,16 @@ class HabitCalendarTab extends StatefulWidget {
 }
 
 class _HabitCalendarTabState extends State<HabitCalendarTab> {
-  late DateTime displayedMonth;// which month is currently shown
+  late DateTime displayedMonth; // which month is currently shown
 
   @override
   void initState() {
     super.initState();
     final now = DateTime.now();
-    displayedMonth = DateTime(now.year, now.month);// Initially shows the current month
+    displayedMonth = DateTime(
+      now.year,
+      now.month,
+    ); // Initially shows the current month
   }
 
   // Moves the calendar to the previous or next month by adjusting displayedMonth
@@ -52,7 +55,9 @@ class _HabitCalendarTabState extends State<HabitCalendarTab> {
 
     for (var completedDate in sortedDates) {
       if (current.isAtSameMomentAs(completedDate) ||
-          current.subtract(const Duration(days: 1)).isAtSameMomentAs(completedDate)) {
+          current
+              .subtract(const Duration(days: 1))
+              .isAtSameMomentAs(completedDate)) {
         streakCount++;
         current = completedDate;
       } else {
@@ -60,10 +65,10 @@ class _HabitCalendarTabState extends State<HabitCalendarTab> {
       }
     }
 
-    return widget.habit.completedDates.any((d) =>
-    d.year == date.year &&
-        d.month == date.month &&
-        d.day == date.day) &&
+    return widget.habit.completedDates.any(
+          (d) =>
+              d.year == date.year && d.month == date.month && d.day == date.day,
+        ) &&
         date.isAfter(current.subtract(Duration(days: streakCount)));
   }
 
@@ -99,8 +104,10 @@ class _HabitCalendarTabState extends State<HabitCalendarTab> {
     final themeProvider = Provider.of<ThemeProvider>(context);
 
     final now = DateTime.now();
-    final daysInMonth =
-    DateUtils.getDaysInMonth(displayedMonth.year, displayedMonth.month);
+    final daysInMonth = DateUtils.getDaysInMonth(
+      displayedMonth.year,
+      displayedMonth.month,
+    );
     final firstDay = DateTime(displayedMonth.year, displayedMonth.month, 1);
     final startingWeekday = firstDay.weekday;
 
@@ -118,7 +125,10 @@ class _HabitCalendarTabState extends State<HabitCalendarTab> {
               ),
               Text(
                 DateFormat.yMMMM().format(displayedMonth), // e.g. "August 2025"
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               IconButton(
                 icon: const Icon(Icons.chevron_right),
@@ -133,8 +143,13 @@ class _HabitCalendarTabState extends State<HabitCalendarTab> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: const [
-              Text("Mon"), Text("Tue"), Text("Wed"),
-              Text("Thu"), Text("Fri"), Text("Sat"), Text("Sun"),
+              Text("Mon"),
+              Text("Tue"),
+              Text("Wed"),
+              Text("Thu"),
+              Text("Fri"),
+              Text("Sat"),
+              Text("Sun"),
             ],
           ),
 
@@ -153,36 +168,44 @@ class _HabitCalendarTabState extends State<HabitCalendarTab> {
                 }
 
                 final day = index - startingWeekday + 2;
-                final date =
-                DateTime(displayedMonth.year, displayedMonth.month, day);
-                final isCompleted = widget.habit.completedDates.any((d) =>
-                d.year == date.year &&
-                    d.month == date.month &&
-                    d.day == date.day);
+                final date = DateTime(
+                  displayedMonth.year,
+                  displayedMonth.month,
+                  day,
+                );
+                final isCompleted = widget.habit.completedDates.any(
+                  (d) =>
+                      d.year == date.year &&
+                      d.month == date.month &&
+                      d.day == date.day,
+                );
                 final isInStreak = _isInStreak(date);
-                final isToday = date.year == now.year &&
+                final isToday =
+                    date.year == now.year &&
                     date.month == now.month &&
                     date.day == now.day;
 
                 return GestureDetector(
                   onTap: () {
-                    Provider.of<HabitProvider>(context, listen: false)
-                        .toggleHabitDate(widget.habit, date);
+                    Provider.of<HabitProvider>(
+                      context,
+                      listen: false,
+                    ).toggleHabitDate(widget.habit, date);
                   },
                   child: Container(
                     margin: const EdgeInsets.all(4),
                     decoration: BoxDecoration(
                       color: isInStreak
-                          ? Colors.green.withOpacity(0.8)
+                          ? Colors.purple.withOpacity(0.8)
                           : isCompleted
-                          ? Colors.green.withOpacity(0.4)
+                          ? Colors.purple.withOpacity(0.4)
                           : Colors.transparent,
                       shape: BoxShape.circle,
                       border: Border.all(
                         color: isToday
                             ? Theme.of(context).colorScheme.primary
                             : (isCompleted || isInStreak)
-                            ? Colors.green
+                            ? Colors.purple
                             : themeProvider.isDarkMode
                             ? Colors.grey[700]!
                             : Colors.grey[300]!,
@@ -196,8 +219,9 @@ class _HabitCalendarTabState extends State<HabitCalendarTab> {
                           color: (isCompleted || isInStreak)
                               ? Colors.white
                               : Theme.of(context).textTheme.bodyLarge?.color,
-                          fontWeight:
-                          isToday ? FontWeight.bold : FontWeight.normal,
+                          fontWeight: isToday
+                              ? FontWeight.bold
+                              : FontWeight.normal,
                         ),
                       ),
                     ),
@@ -219,8 +243,10 @@ class _HabitCalendarTabState extends State<HabitCalendarTab> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.local_fire_department,
-                        color: Theme.of(context).colorScheme.secondary),
+                    Icon(
+                      Icons.local_fire_department,
+                      color: Theme.of(context).colorScheme.secondary,
+                    ),
                     const SizedBox(width: 8),
                     Text(
                       '${widget.habit.currentStreak} day streak',
@@ -245,6 +271,4 @@ class _HabitCalendarTabState extends State<HabitCalendarTab> {
       ),
     );
   }
-
-  
 }

@@ -11,7 +11,7 @@ class ProgressScreen extends StatefulWidget {
 }
 
 class _ProgressScreenState extends State<ProgressScreen> {
-  List<int> weeklyData = List.filled(7, 0); // 7 days of 0s/1s
+  List<int> weeklyData = List.filled(7, 0); // Mon-Sun
   int streak = 0;
   List<Map<String, dynamic>> upcomingGoals = [];
 
@@ -33,32 +33,52 @@ class _ProgressScreenState extends State<ProgressScreen> {
 
     if (habitsSnapshot.docs.isEmpty) return;
 
-    // For simplicity: take first habit (extend for multiple habits later)
-    final habit = habitsSnapshot.docs.first.data();
-    final List<dynamic> completedDates = habit["completedDates"] ?? [];
-
-    // Convert string dates to DateTime
-    final completed = completedDates
-        .map<DateTime>((d) => DateTime.parse(d.toString()))
-        .toList();
-
-    // Build weekly data (Mon-Sun)
     final now = DateTime.now();
+
+    // last 7 days for chart
     final last7Days = List.generate(
       7,
       (i) => DateTime(now.year, now.month, now.day - (6 - i)),
     );
 
-    setState(() {
-      weeklyData = last7Days
-          .map((day) =>
-              completed.any((c) => _isSameDay(c, day)) ? 1 : 0)
+    // Collect habits into list
+    List<Map<String, dynamic>> goals = [];
+
+    for (var doc in habitsSnapshot.docs) {
+      final habit = doc.data();
+
+      // Handle completedDates (if missing, just empty)
+      final List<dynamic> completedDates = habit["completedDates"] ?? [];
+      final completed = completedDates
+          .map<DateTime>((d) {
+            if (d is Timestamp) return d.toDate();
+            return DateTime.tryParse(d.toString()) ?? DateTime.now();
+          })
           .toList();
 
-      streak = _calculateStreak(completed);
-      upcomingGoals = habitsSnapshot.docs
-          .map((doc) => doc.data())
+      // Weekly data → mark if habit was completed in last 7 days
+      final week = last7Days
+          .map((day) => completed.any((c) => _isSameDay(c, day)) ? 1 : 0)
           .toList();
+
+      // Merge with global weeklyData (if multiple habits exist)
+      for (int i = 0; i < week.length; i++) {
+        if (week[i] == 1) weeklyData[i] = 1;
+      }
+
+      // Streak (for now just based on one habit; you can extend this later)
+      streak = _calculateStreak(completed);
+
+      // Add to upcoming goals list
+      goals.add({
+        "title": habit["title"] ?? "",
+        "frequency": habit["frequency"] ?? "",
+        "description": habit["description"] ?? "",
+      });
+    }
+
+    setState(() {
+      upcomingGoals = goals;
     });
   }
 
@@ -75,7 +95,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
       if (completed.any((c) => _isSameDay(c, day))) {
         count++;
       } else {
-        break; // streak broken
+        break;
       }
     }
     return count;
@@ -85,7 +105,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Progress & Streaks"),
+        title: const Text("Your Progresses"),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -113,12 +133,13 @@ class _ProgressScreenState extends State<ProgressScreen> {
                         showTitles: true,
                         getTitlesWidget: (value, meta) {
                           const days = ["M", "T", "W", "T", "F", "S", "S"];
-                          if (value.toInt() < 0 ||
-                              value.toInt() >= days.length) {
+                          if (value.toInt() < 0 || value.toInt() >= days.length) {
                             return const SizedBox.shrink();
                           }
-                          return Text(days[value.toInt()],
-                              style: const TextStyle(fontWeight: FontWeight.bold));
+                          return Text(
+                            days[value.toInt()],
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          );
                         },
                       ),
                     ),
@@ -139,7 +160,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                         BarChartRodData(
                           toY: weeklyData[index].toDouble(),
                           color: weeklyData[index] == 1
-                              ? Colors.green
+                              ? const Color.fromARGB(255, 175, 76, 175)
                               : Colors.redAccent,
                           width: 18,
                           borderRadius: BorderRadius.circular(4),
@@ -153,9 +174,8 @@ class _ProgressScreenState extends State<ProgressScreen> {
 
             const SizedBox(height: 30),
 
-            // Streak
             const Text(
-              "Current Streak",
+              "Your Current Streak",
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
@@ -168,10 +188,10 @@ class _ProgressScreenState extends State<ProgressScreen> {
                 leading: const Icon(Icons.local_fire_department,
                     color: Colors.orange, size: 40),
                 title: Text(
-                  "🔥 $streak Days",
+                  "$streak Days",
                   style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
-                subtitle: const Text("Keep going! You're on a roll 💪"),
+                subtitle: const Text("you got this"),
               ),
             ),
 
@@ -187,9 +207,11 @@ class _ProgressScreenState extends State<ProgressScreen> {
                 children: upcomingGoals.map((goal) {
                   return ListTile(
                     leading: const Icon(Icons.check_circle_outline,
-                        color: Colors.teal),
+                        color: Color.fromARGB(255, 150, 0, 127)),
                     title: Text(goal["title"] ?? ""),
-                    subtitle: Text("Goal: ${goal["frequency"] ?? ""}"),
+                    subtitle: Text(
+                      "Goal: ${goal["frequency"] ?? ""}\n${goal["description"] ?? ""}",
+                    ),
                   );
                 }).toList(),
               ),

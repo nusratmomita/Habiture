@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/quote_provider.dart';
-import '../../widgets/quote_card.dart'; // Import the QuoteCard
+import '../../widgets/quote_card.dart'; 
 
 class QuotesCategoryScreen extends StatelessWidget {
   final String category;
@@ -19,7 +19,7 @@ class QuotesCategoryScreen extends StatelessWidget {
         return Scaffold(
           appBar: AppBar(
             title: Text(category),
-            backgroundColor: Colors.deepPurpleAccent.shade100,
+            backgroundColor: const Color.fromARGB(34, 180, 136, 255),
           ),
           body: isLoading
               ? const Center(child: CircularProgressIndicator())
