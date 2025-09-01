@@ -4,7 +4,8 @@ class HabitModel {
   final String id;
   final String title;
   final String description;
-  final String frequency;// everyday or sometimes
+  final String frequency; // daily, weekly, monthly
+  final String category; // NEW
   final DateTime createdAt;
   final List<DateTime> completedDates;
 
@@ -13,23 +14,27 @@ class HabitModel {
     required this.title,
     required this.description,
     required this.frequency,
+    required this.category, // NEW
     required this.createdAt,
     required this.completedDates,
   });
- 
- // reading data from firebase
+
+  // reading data from firebase
   factory HabitModel.fromMap(Map<String, dynamic> habit, String documentId) {
     return HabitModel(
       id: documentId,
       title: habit['title'] ?? '',
       description: habit['description'] ?? '',
-      frequency: habit['frequency'] ?? 'day',
+      frequency: habit['frequency'] ?? 'daily',
+      category: habit['category'] ?? 'General', // fallback if missing
       createdAt: (habit['createdAt'] is Timestamp)
           ? (habit['createdAt'] as Timestamp).toDate()
           : DateTime.now(),
       completedDates: (habit['completedDates'] as List<dynamic>?)
-          ?.map((e) => e is Timestamp ? e.toDate() : DateTime.tryParse(e.toString())!)
-          .toList() ?? [],
+              ?.map((e) =>
+                  e is Timestamp ? e.toDate() : DateTime.tryParse(e.toString())!)
+              .toList() ??
+          [],
     );
   }
 
@@ -40,14 +45,16 @@ class HabitModel {
       'title': title,
       'description': description,
       'frequency': frequency,
-      'createdAt': Timestamp.fromDate(createdAt),// getting the current date and time of a habit
-      'completedDates': completedDates.map((e) => Timestamp.fromDate(e)).toList(),
+      'category': category, // NEW
+      'createdAt': Timestamp.fromDate(createdAt),
+      'completedDates':
+          completedDates.map((e) => Timestamp.fromDate(e)).toList(),
     };
   }
 
   // calculating streak
   int get currentStreak {
-    if (completedDates.isEmpty) return 0;// not continued
+    if (completedDates.isEmpty) return 0;
 
     final sortedDates = List<DateTime>.from(completedDates)
       ..sort((a, b) => b.compareTo(a));
@@ -70,14 +77,13 @@ class HabitModel {
   int get longestStreak {
     if (completedDates.isEmpty) return 0;
 
-    final sortedDates = List<DateTime>.from(completedDates)
-      ..sort();
+    final sortedDates = List<DateTime>.from(completedDates)..sort();
 
     int longest = 1;
     int current = 1;
 
     for (int i = 1; i < sortedDates.length; i++) {
-      final diff = sortedDates[i].difference(sortedDates[i-1]).inDays;
+      final diff = sortedDates[i].difference(sortedDates[i - 1]).inDays;
       if (diff == 1) {
         current++;
         if (current > longest) longest = current;
@@ -113,17 +119,17 @@ class HabitModel {
   double get completionPercentage {
     final now = DateTime.now();
     final weekStart = now.subtract(Duration(days: now.weekday));
-    final completedDays = completedDates.where((date) =>
-    date.isAfter(weekStart) && date.isBefore(now.add(const Duration(days: 1)))
-    ).length;
+    final completedDays = completedDates
+        .where((date) =>
+            date.isAfter(weekStart) &&
+            date.isBefore(now.add(const Duration(days: 1))))
+        .length;
 
     return (completedDays / 7) * 100;
   }
 
   bool isDateCompleted(DateTime date) {
     return completedDates.any((d) =>
-    d.year == date.year &&
-        d.month == date.month &&
-        d.day == date.day);
+        d.year == date.year && d.month == date.month && d.day == date.day);
   }
 }

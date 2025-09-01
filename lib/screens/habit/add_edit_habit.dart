@@ -9,6 +9,7 @@ class AddEditHabitScreen extends StatefulWidget {
   final String? existingTitle;
   final String? existingDescription;
   final List<DateTime>? existingCompletedDates;
+  final String? existingCategory;
 
   const AddEditHabitScreen({
     Key? key,
@@ -16,6 +17,7 @@ class AddEditHabitScreen extends StatefulWidget {
     this.existingTitle,
     this.existingDescription,
     this.existingCompletedDates,
+    this.existingCategory,
   }) : super(key: key);
 
   @override
@@ -27,7 +29,18 @@ class _AddEditHabitScreenState extends State<AddEditHabitScreen> {
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
   String _selectedFrequency = 'daily';
+  String _selectedCategory = 'General';
   bool _isLoading = false;
+
+  final List<String> _categories = [
+    'General',
+    'Health',
+    'Fitness',
+    'Study',
+    'Work',
+    'Finance',
+    'Personal Growth',
+  ];
 
   @override
   void initState() {
@@ -35,6 +48,7 @@ class _AddEditHabitScreenState extends State<AddEditHabitScreen> {
     if (widget.habitId != null) {
       _titleController.text = widget.existingTitle ?? '';
       _descriptionController.text = widget.existingDescription ?? '';
+      _selectedCategory = widget.existingCategory ?? 'General';
     }
   }
 
@@ -68,6 +82,7 @@ class _AddEditHabitScreenState extends State<AddEditHabitScreen> {
         title: _titleController.text.trim(),
         description: _descriptionController.text.trim(),
         frequency: _selectedFrequency,
+        category: _selectedCategory,
         createdAt: DateTime.now(),
         completedDates: widget.habitId == null
             ? []
@@ -155,7 +170,7 @@ class _AddEditHabitScreenState extends State<AddEditHabitScreen> {
                       controller: _titleController,
                       decoration: InputDecoration(
                         labelText: "Habit Name",
-                        prefixIcon: const Icon(Icons.task_alt),
+                        prefixIcon: const Icon(Icons.task_alt, size: 28),
                         filled: true,
                         fillColor: Colors.grey.shade100,
                         border: OutlineInputBorder(
@@ -174,7 +189,7 @@ class _AddEditHabitScreenState extends State<AddEditHabitScreen> {
                       controller: _descriptionController,
                       decoration: InputDecoration(
                         labelText: "Habit Description",
-                        prefixIcon: const Icon(Icons.description_outlined),
+                        prefixIcon: const Icon(Icons.description_outlined, size: 28),
                         filled: true,
                         fillColor: Colors.grey.shade100,
                         border: OutlineInputBorder(
@@ -184,13 +199,42 @@ class _AddEditHabitScreenState extends State<AddEditHabitScreen> {
                       maxLines: 3,
                     ),
                     const SizedBox(height: 16),
+
+                    // Category Dropdown
+                    DropdownButtonFormField<String>(
+                      value: _selectedCategory,
+                      items: _categories
+                          .map((cat) => DropdownMenuItem(
+                                value: cat,
+                                child: Text(cat),
+                              ))
+                          .toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedCategory = value!;
+                        });
+                      },
+                      decoration: InputDecoration(
+                        labelText: 'Category',
+                        prefixIcon: const Icon(Icons.category, size: 28),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        filled: true,
+                        fillColor: Colors.grey.shade100,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Frequency Dropdown
                     DropdownButtonFormField<String>(
                       value: _selectedFrequency,
                       items: ['daily', 'weekly', 'monthly']
                           .map((frequency) => DropdownMenuItem(
                                 value: frequency,
-                                child: Text(frequency[0].toUpperCase() +
-                                    frequency.substring(1)),
+                                child: Text(
+                                  frequency[0].toUpperCase() + frequency.substring(1),
+                                ),
                               ))
                           .toList(),
                       onChanged: (value) {
@@ -200,7 +244,7 @@ class _AddEditHabitScreenState extends State<AddEditHabitScreen> {
                       },
                       decoration: InputDecoration(
                         labelText: 'Frequency',
-                        prefixIcon: const Icon(Icons.repeat),
+                        prefixIcon: const Icon(Icons.repeat, size: 28),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(14),
                         ),
@@ -209,6 +253,7 @@ class _AddEditHabitScreenState extends State<AddEditHabitScreen> {
                       ),
                     ),
                     const SizedBox(height: 30),
+
                     SizedBox(
                       width: double.infinity,
                       height: 50,
@@ -222,12 +267,10 @@ class _AddEditHabitScreenState extends State<AddEditHabitScreen> {
                         ),
                         icon: Icon(
                           isEditing ? Icons.update : Icons.add,
-                          size: 22,
+                          size: 24,
                         ),
                         label: Text(
-                          isEditing
-                              ? "Update Habit"
-                              : "Add New Habit",
+                          isEditing ? "Update Habit" : "Add New Habit",
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
