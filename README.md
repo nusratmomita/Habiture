@@ -19,6 +19,11 @@
 <h4>flutter_staggered_animations0: For adding animations</h4>
 <h4>carousel_slider: For carousel sliders to see reviews of users</h4>
 
+<h4>Project Preview: 👩‍💻</h4>
+<img src="https://i.ibb.co.com/VYHr9806/login-Page-Flutter.png" alt="loginPage">
+<img src="https://i.ibb.co.com/S4Qb6kd1/home-Page-Flutter.png" alt="homePage">
+<img src="https://i.ibb.co.com/0bTcjJc/progress.png" alt="progressPage">
+
 <h1>How to setup the project: 💻</h1>
 <h4>Create a folder named Habiture.</h4>
 <h4>Open the terminal after opening the project in the VS code.</h4>
