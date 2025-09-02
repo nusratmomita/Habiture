@@ -15,7 +15,15 @@ class FavoriteQuotesScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.deepPurple[800],
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.deepPurple[700]!, Colors.deepPurple[900]!],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
         title: const Text(
           'Favorite Quotes',
           style: TextStyle(
@@ -24,25 +32,18 @@ class FavoriteQuotesScreen extends StatelessWidget {
           ),
         ),
         centerTitle: true,
-        elevation: 0,
+        elevation: 4,
         actions: [
           if (favorites.isNotEmpty)
             Padding(
               padding: const EdgeInsets.only(right: 16.0),
-              child: Center(
-                child: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.deepPurple[400],
-                    shape: BoxShape.circle,
-                  ),
-                  child: Text(
-                    favorites.length.toString(),
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                      color: Colors.white,
-                    ),
+              child: Chip(
+                backgroundColor: Colors.white,
+                label: Text(
+                  favorites.length.toString(),
+                  style: const TextStyle(
+                    color: Colors.deepPurple,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
@@ -55,8 +56,8 @@ class FavoriteQuotesScreen extends StatelessWidget {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Colors.deepPurple[900]!,
-              Colors.white.withOpacity(0.1),
+              Colors.deepPurple[50]!,
+              Colors.white,
             ],
           ),
         ),
@@ -79,17 +80,24 @@ class FavoriteQuotesScreen extends StatelessWidget {
                         child: SlideAnimation(
                           verticalOffset: 50.0,
                           child: FadeInAnimation(
-                            child: Padding(
-                              padding: const EdgeInsets.only(bottom: 16.0),
-                              child: QuoteCard(
-                                quote: quote,
-                                isFavorite: true,
-                                onFavoriteToggle: () {
-                                  quotesProvider.toggleFavorite(quote);
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    _buildRemovedSnackBar(quote.text),
-                                  );
-                                },
+                            child: Card(
+                              elevation: 6,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 8),
+                                child: QuoteCard(
+                                  quote: quote,
+                                  isFavorite: true,
+                                  onFavoriteToggle: () {
+                                    quotesProvider.toggleFavorite(quote);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      _buildRemovedSnackBar(quote.text),
+                                    );
+                                  },
+                                ),
                               ),
                             ),
                           ),
@@ -111,23 +119,23 @@ class FavoriteQuotesScreen extends StatelessWidget {
         children: [
           Icon(
             Icons.favorite_border,
-            size: 72,
-            color: Colors.deepPurple[300],
+            size: 80,
+            color: Colors.deepPurple[400],
           ),
           const SizedBox(height: 24),
           Text(
             'No favorites yet',
             style: TextStyle(
-              fontSize: 20,
+              fontSize: 22,
               fontWeight: FontWeight.bold,
-              color: Colors.grey[700],
+              color: Colors.deepPurple[700],
             ),
           ),
           const SizedBox(height: 12),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 48.0),
+            padding: const EdgeInsets.symmetric(horizontal: 32.0),
             child: Text(
-              'Tap the heart icon on any quote to add it to your favorites',
+              'Tap the heart icon on any quote to save it here!',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 16,
@@ -151,17 +159,17 @@ class FavoriteQuotesScreen extends StatelessWidget {
       duration: const Duration(seconds: 2),
       action: SnackBarAction(
         label: 'UNDO',
-        textColor: Colors.yellowAccent,
+        textColor: Colors.indigoAccent,
         onPressed: () {
           // TODO: implement undo functionality in your provider
         },
       ),
       behavior: SnackBarBehavior.floating,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(12),
       ),
       margin: const EdgeInsets.all(16),
-      backgroundColor: Colors.deepPurple[700],
+      backgroundColor: const Color.fromARGB(255, 168, 45, 119),
     );
   }
 

@@ -1,3 +1,5 @@
+// nusratmomita@gmail.com Nusrat123!
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'providers/auth_provider.dart';
@@ -9,7 +11,7 @@ import 'screens/registration_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/splash_screen.dart';
 import 'screens/habit/add_edit_habit.dart';
-import 'screens/quotes/categories.dart'; // ✅ Import CategoriesScreen
+import 'screens/quotes/categories.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 

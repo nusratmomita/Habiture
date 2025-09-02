@@ -29,7 +29,7 @@ class FirestoreService {
         .collection('users')
         .doc(userId)
         .collection('habits')
-        .orderBy('createdAt', descending: true) // ✅ newest first
+        .orderBy('createdAt', descending: true)
         .snapshots()
         .map((snapshot) =>
         snapshot.docs.map((doc) => HabitModel.fromMap(doc.data(), doc.id)).toList());
@@ -41,7 +41,7 @@ class FirestoreService {
         .doc(userId)
         .collection('habits')
         .doc(habit.id)
-        .set(habit.toMap(), SetOptions(merge: true)); // ✅ merge prevents overwrite
+        .set(habit.toMap(), SetOptions(merge: true)); // merging prevents overwrite
   }
 
   Future<void> deleteHabit(String userId, String habitId) async {

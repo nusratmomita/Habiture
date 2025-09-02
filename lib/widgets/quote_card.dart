@@ -18,74 +18,78 @@ class QuoteCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 3,
-      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        onTap: () {},
+      elevation: 6,
+      margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          gradient: LinearGradient(
+            colors: [Colors.deepPurple.shade50, Colors.purple.shade100],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(18.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Decorative quote icon
+              const Icon(Icons.format_quote,
+                  color: Colors.deepPurple, size: 30),
+              const SizedBox(height: 8),
+
               // Quote text
               Text(
                 '"${quote.text}"',
                 style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  height: 1.4,
+                  fontSize: 18,
+                  fontStyle: FontStyle.italic,
+                  fontWeight: FontWeight.w600,
+                  height: 1.5,
+                  color: Color(0xFF3D2C8D),
                 ),
               ),
-              const SizedBox(height: 8),
-              // Author
-              if (quote.writer != null && quote.writer!.isNotEmpty)
-                Text(
-                  '- ${quote.writer}',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[600],
-                    fontStyle: FontStyle.italic,
-                  ),
-                ),
-              const SizedBox(height: 12),
-              // Action buttons
+
+              const SizedBox(height: 16),
+
+              // Action buttons row
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  // Share button
-                  IconButton(
-                    icon: const Icon(Icons.share, color: Colors.purple),
-                    tooltip: 'Share quote',
+                  _buildActionIcon(
+                    context,
+                    icon: Icons.share,
+                    color: Colors.pinkAccent,
+                    tooltip: "Share quote",
                     onPressed: () {
-                      Share.share(
-                        '"${quote.text}" ${quote.writer != null ? '- ${quote.writer}' : ''}',
-                        subject: 'Inspirational Quote',
-                      );
+                      // Add your share logic
+                      Share.share(quote.text);
                     },
                   ),
-                  // Copy button
-                  IconButton(
-                    icon: const Icon(Icons.copy, color: Colors.blueAccent),
-                    tooltip: 'Copy quote',
+                  const SizedBox(width: 10),
+                  _buildActionIcon(
+                    context,
+                    icon: Icons.copy,
+                    color: Colors.blueAccent,
+                    tooltip: "Copy the quote",
                     onPressed: () {
                       Clipboard.setData(ClipboardData(text: quote.text));
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('Quote copied to clipboard'),
+                          content: Text('Copied to clipboard'),
                           behavior: SnackBarBehavior.floating,
                           margin: EdgeInsets.all(16),
                         ),
                       );
                     },
                   ),
-                  // Favorite button
-                  IconButton(
-                    icon: Icon(
-                      isFavorite ? Icons.favorite : Icons.favorite_border,
-                      color: const Color.fromARGB(255, 255, 82, 192),
-                    ),
+                  const SizedBox(width: 10),
+                  _buildActionIcon(
+                    context,
+                    icon: isFavorite ? Icons.favorite : Icons.favorite_border,
+                    color: Colors.deepPurple,
                     tooltip: isFavorite
                         ? 'Remove from favorites'
                         : 'Add to favorites',
@@ -95,6 +99,31 @@ class QuoteCard extends StatelessWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  /// Helper widget for action icons with circular background
+  Widget _buildActionIcon(
+    BuildContext context, {
+    required IconData icon,
+    required Color color,
+    required String tooltip,
+    required VoidCallback? onPressed,
+  }) {
+    return Tooltip(
+      message: tooltip,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: onPressed,
+        child: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.1),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(icon, color: color, size: 22),
         ),
       ),
     );

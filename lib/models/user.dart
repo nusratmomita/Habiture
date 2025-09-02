@@ -2,13 +2,11 @@ class UserModel {
   final String id;
   final String name;
   final String email;
-  final String? photoUrl;
 
   UserModel({
     required this.id,
     required this.name,
     required this.email,
-    this.photoUrl,
   });
 
   // Convert Firestore doc → Model
@@ -17,7 +15,6 @@ class UserModel {
       id: documentId,
       name: data['name'] ?? '',
       email: data['email'] ?? '',
-      photoUrl: data['photoUrl'],
     );
   }
 
@@ -26,7 +23,6 @@ class UserModel {
     return {
       'name': name,
       'email': email,
-      'photoUrl': photoUrl,
     };
   }
 }

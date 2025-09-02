@@ -1,16 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';// !
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-// AuthProvider manages Firebase Authentication and user data in Firestore
 class AuthProvider with ChangeNotifier {
-  final FirebaseAuth _auth = FirebaseAuth.instance; // Firebase Auth instance
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance; // ! Firestore instance
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  // Current logged-in user
   User? get currentUser => _auth.currentUser;
 
-  //create a new User
+  Stream<User?> get authStateChanges => _auth.authStateChanges();
+
+  // Update display name and notify listeners
+  Future<void> updateDisplayName(String name) async {
+    final user = _auth.currentUser;
+    if (user != null) {
+      await user.updateDisplayName(name); // Update in Firebase Auth
+      await user.reload(); // Refresh user info
+      notifyListeners(); // Notify UI
+    }
+  }
+
+  Future<void> logout() async {
+    await _auth.signOut();
+    notifyListeners();
+  }
+
+  Future<String?> loginUser({
+    required String email,
+    required String password,
+  }) async {
+    try {
+      await _auth.signInWithEmailAndPassword(email: email, password: password);
+      notifyListeners();
+      return null;
+    } on FirebaseAuthException catch (e) {
+      return e.message;
+    } catch (e) {
+      return e.toString();
+    }
+  }
+
   Future<String?> registerUser({
     required String email,
     required String password,
@@ -25,67 +54,27 @@ class AuthProvider with ChangeNotifier {
       );
 
       User? user = userCredential.user;
-
       if (user != null) {
-        String userId = user.uid;
-
-        // Set display name in Firebase Auth profile
         await user.updateDisplayName(displayName);
 
-        // Create user document in Firestore
-        await _firestore.collection('users').doc(userId).set({
-          'uid': userId,
+        await _firestore.collection('users').doc(user.uid).set({
+          'uid': user.uid,
           'displayName': displayName,
           'email': email,
-          'gender': gender ?? '', // store gender if provided
-          'otherDetails': (otherDetails != null &&
-                  otherDetails is Map<String, dynamic>)
-              ? otherDetails
-              : {}, // optional extra fields
-          'createdAt': FieldValue.serverTimestamp(), // creation timestamp
+          'gender': gender ?? '',
+          'otherDetails': otherDetails ?? {},
+          'createdAt': FieldValue.serverTimestamp(),
         });
 
-        notifyListeners(); // notify UI of auth changes
-        return null; // success
+        notifyListeners();
+        return null;
       }
 
-      // Fallback error if user is null
       return "Unknown error: User is null";
-
     } on FirebaseAuthException catch (e) {
-      debugPrint("FirebaseAuth error: ${e.message}");
-      return e.message; // return Firebase auth error message
+      return e.message;
     } catch (e) {
-      debugPrint("Unknown register: $e");
-      return "Error occurred: $e"; // return generic error
+      return e.toString();
     }
   }
-
-  // 🔹 Login User
-  Future<String?> loginUser({
-    required String email,
-    required String password,
-  }) async {
-    try {
-      // Sign in with Firebase Auth
-      await _auth.signInWithEmailAndPassword(email: email, password: password);
-      notifyListeners(); // notify UI of auth changes
-      return null; // success
-    } on FirebaseAuthException catch (e) {
-      debugPrint("FirebaseAuth error: ${e.message}");
-      return e.message; // return Firebase auth error
-    } catch (e) {
-      debugPrint("Unknown login: $e");
-      return "Error occurred: $e"; // generic error
-    }
-  }
-
-  // 🔹 Logout
-  Future<void> logout() async {
-    await _auth.signOut(); // Sign out user
-    notifyListeners(); // notify UI
-  }
-
-  // 🔹 Stream to listen to authentication state changes
-  Stream<User?> get authStateChanges => _auth.authStateChanges();
 }

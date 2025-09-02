@@ -50,7 +50,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Quote Categories'),
+        title: const Text('Quote Categories!!!'),
         backgroundColor: Colors.deepPurple.shade700,
       ),
       body: quotesProvider.categories.isEmpty

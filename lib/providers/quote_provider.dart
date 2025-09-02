@@ -40,12 +40,6 @@ class QuotesProvider extends ChangeNotifier {
       "Your future self is built by your current habits.",
       "Habits outlive motivation, and that’s their power.",
     ],
-    "Growth": [
-      "Growth begins when a habit challenges your comfort zone.",
-      "A habit of learning guarantees a lifetime of growth.",
-      "Growth is not what happens in a day, but what habits repeat daily.",
-      "To grow, plant one habit and water it with consistency.",
-    ],
   };
 
   QuotesProvider({required this.userId}) {
@@ -87,7 +81,6 @@ class QuotesProvider extends ChangeNotifier {
             (entry) => QuoteMode(
           id: '${category}_${entry.key}',
           text: entry.value,
-          writer: category,
           tags: [category],
           isFavorite:
           favorites.any((f) => f.id == '${category}_${entry.key}'),

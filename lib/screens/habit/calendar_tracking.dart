@@ -1,7 +1,6 @@
-// a calendar view for a single habit, showing which days it was completed and streaks.
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:intl/intl.dart'; // for month formatting
+import 'package:intl/intl.dart';
 import '../../models/habit.dart';
 import '../../providers/habit_provider.dart';
 import '../../providers/theme_provider.dart';
@@ -16,19 +15,15 @@ class HabitCalendarTab extends StatefulWidget {
 }
 
 class _HabitCalendarTabState extends State<HabitCalendarTab> {
-  late DateTime displayedMonth; // which month is currently shown
+  late DateTime displayedMonth;
 
   @override
   void initState() {
     super.initState();
     final now = DateTime.now();
-    displayedMonth = DateTime(
-      now.year,
-      now.month,
-    ); // Initially shows the current month
+    displayedMonth = DateTime(now.year, now.month);
   }
 
-  // Moves the calendar to the previous or next month by adjusting displayedMonth
   void _goToPreviousMonth() {
     setState(() {
       displayedMonth = DateTime(displayedMonth.year, displayedMonth.month - 1);
@@ -41,9 +36,6 @@ class _HabitCalendarTabState extends State<HabitCalendarTab> {
     });
   }
 
-  // Check Streak
-  // Determines if a date is part of the habit’s current streak.
-  // Compares each completed date to today, counting consecutive completions
   bool _isInStreak(DateTime date) {
     if (widget.habit.completedDates.isEmpty) return false;
 
@@ -55,9 +47,7 @@ class _HabitCalendarTabState extends State<HabitCalendarTab> {
 
     for (var completedDate in sortedDates) {
       if (current.isAtSameMomentAs(completedDate) ||
-          current
-              .subtract(const Duration(days: 1))
-              .isAtSameMomentAs(completedDate)) {
+          current.subtract(const Duration(days: 1)).isAtSameMomentAs(completedDate)) {
         streakCount++;
         current = completedDate;
       } else {
@@ -66,16 +56,11 @@ class _HabitCalendarTabState extends State<HabitCalendarTab> {
     }
 
     return widget.habit.completedDates.any(
-          (d) =>
-              d.year == date.year && d.month == date.month && d.day == date.day,
+          (d) => d.year == date.year && d.month == date.month && d.day == date.day,
         ) &&
         date.isAfter(current.subtract(Duration(days: streakCount)));
   }
 
-  // Calculate Longest Streak
-  //   Sorts completedDates in descending order.
-
-  // Iterates through dates to find maximum consecutive days
   int _calculateLongestStreak() {
     if (widget.habit.completedDates.isEmpty) return 0;
 
@@ -102,12 +87,8 @@ class _HabitCalendarTabState extends State<HabitCalendarTab> {
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
-
     final now = DateTime.now();
-    final daysInMonth = DateUtils.getDaysInMonth(
-      displayedMonth.year,
-      displayedMonth.month,
-    );
+    final daysInMonth = DateUtils.getDaysInMonth(displayedMonth.year, displayedMonth.month);
     final firstDay = DateTime(displayedMonth.year, displayedMonth.month, 1);
     final startingWeekday = firstDay.weekday;
 
@@ -115,7 +96,7 @@ class _HabitCalendarTabState extends State<HabitCalendarTab> {
       padding: const EdgeInsets.all(16.0),
       child: Column(
         children: [
-          // Month & Year header with navigation
+          // Month & Year header
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -124,10 +105,11 @@ class _HabitCalendarTabState extends State<HabitCalendarTab> {
                 onPressed: _goToPreviousMonth,
               ),
               Text(
-                DateFormat.yMMMM().format(displayedMonth), // e.g. "August 2025"
-                style: const TextStyle(
-                  fontSize: 20,
+                DateFormat.yMMMM().format(displayedMonth),
+                style: TextStyle(
+                  fontSize: 22,
                   fontWeight: FontWeight.bold,
+                  color: themeProvider.isDarkMode ? Colors.white : Colors.black87,
                 ),
               ),
               IconButton(
@@ -136,92 +118,94 @@ class _HabitCalendarTabState extends State<HabitCalendarTab> {
               ),
             ],
           ),
-
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
 
           // Weekday labels
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: const [
-              Text("Mon"),
-              Text("Tue"),
-              Text("Wed"),
-              Text("Thu"),
-              Text("Fri"),
-              Text("Sat"),
-              Text("Sun"),
+              Text("Mon", style: TextStyle(fontWeight: FontWeight.bold)),
+              Text("Tue", style: TextStyle(fontWeight: FontWeight.bold)),
+              Text("Wed", style: TextStyle(fontWeight: FontWeight.bold)),
+              Text("Thu", style: TextStyle(fontWeight: FontWeight.bold)),
+              Text("Fri", style: TextStyle(fontWeight: FontWeight.bold)),
+              Text("Sat", style: TextStyle(fontWeight: FontWeight.bold)),
+              Text("Sun", style: TextStyle(fontWeight: FontWeight.bold)),
             ],
           ),
-
           const SizedBox(height: 8),
 
           // Calendar Grid
           Expanded(
             child: GridView.builder(
+              physics: const BouncingScrollPhysics(),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 7,
+                mainAxisSpacing: 8,
+                crossAxisSpacing: 8,
               ),
               itemCount: daysInMonth + startingWeekday - 1,
               itemBuilder: (context, index) {
-                if (index < startingWeekday - 1) {
-                  return const SizedBox.shrink();
-                }
+                if (index < startingWeekday - 1) return const SizedBox.shrink();
 
                 final day = index - startingWeekday + 2;
-                final date = DateTime(
-                  displayedMonth.year,
-                  displayedMonth.month,
-                  day,
-                );
+                final date = DateTime(displayedMonth.year, displayedMonth.month, day);
                 final isCompleted = widget.habit.completedDates.any(
-                  (d) =>
-                      d.year == date.year &&
-                      d.month == date.month &&
-                      d.day == date.day,
+                  (d) => d.year == date.year && d.month == date.month && d.day == date.day,
                 );
                 final isInStreak = _isInStreak(date);
-                final isToday =
-                    date.year == now.year &&
-                    date.month == now.month &&
-                    date.day == now.day;
+                final isToday = date.year == now.year && date.month == now.month && date.day == now.day;
 
                 return GestureDetector(
                   onTap: () {
-                    Provider.of<HabitProvider>(
-                      context,
-                      listen: false,
-                    ).toggleHabitDate(widget.habit, date);
+                    Provider.of<HabitProvider>(context, listen: false).toggleHabitDate(widget.habit, date);
                   },
-                  child: Container(
-                    margin: const EdgeInsets.all(4),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
                     decoration: BoxDecoration(
-                      color: isInStreak
-                          ? Colors.purple.withOpacity(0.8)
+                      gradient: isInStreak
+                          ? LinearGradient(
+                              colors: [Colors.purple, Colors.deepPurple],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            )
                           : isCompleted
-                          ? Colors.purple.withOpacity(0.4)
-                          : Colors.transparent,
+                              ? LinearGradient(
+                                  colors: [Colors.purple.withOpacity(0.4), Colors.purple.withOpacity(0.7)],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                )
+                              : null,
+                      color: (!isCompleted && !isInStreak)
+                          ? Colors.transparent
+                          : null,
                       shape: BoxShape.circle,
                       border: Border.all(
                         color: isToday
                             ? Theme.of(context).colorScheme.primary
                             : (isCompleted || isInStreak)
-                            ? Colors.purple
-                            : themeProvider.isDarkMode
-                            ? Colors.grey[700]!
-                            : Colors.grey[300]!,
-                        width: isToday ? 2 : 1,
+                                ? Colors.purple
+                                : themeProvider.isDarkMode
+                                    ? Colors.grey[700]!
+                                    : Colors.grey[300]!,
+                        width: isToday ? 2.5 : 1.5,
                       ),
+                      boxShadow: isToday
+                          ? [
+                              BoxShadow(
+                                color: Colors.purple.withOpacity(0.3),
+                                blurRadius: 6,
+                                offset: const Offset(0, 2),
+                              ),
+                            ]
+                          : null,
                     ),
                     child: Center(
                       child: Text(
                         day.toString(),
                         style: TextStyle(
-                          color: (isCompleted || isInStreak)
-                              ? Colors.white
-                              : Theme.of(context).textTheme.bodyLarge?.color,
-                          fontWeight: isToday
-                              ? FontWeight.bold
-                              : FontWeight.normal,
+                          color: (isCompleted || isInStreak) ? Colors.white : Theme.of(context).textTheme.bodyLarge?.color,
+                          fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
                         ),
                       ),
                     ),
@@ -231,38 +215,36 @@ class _HabitCalendarTabState extends State<HabitCalendarTab> {
             ),
           ),
 
-          // Streak Info
+          const SizedBox(height: 16),
+
+          // Streak Info Card
           Container(
+            width: double.infinity,
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.secondary.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.purple.withOpacity(0.2),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
             child: Column(
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
-                      Icons.local_fire_department,
-                      color: Theme.of(context).colorScheme.secondary,
-                    ),
+                    Icon(Icons.local_fire_department, color: Colors.deepPurple),
                     const SizedBox(width: 8),
-                    Text(
-                      '${widget.habit.currentStreak} day streak',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Theme.of(context).textTheme.bodyLarge?.color,
-                      ),
-                    ),
                   ],
                 ),
                 const SizedBox(height: 8),
                 Text(
                   'Longest streak: ${_calculateLongestStreak()} days',
-                  style: TextStyle(
-                    color: Theme.of(context).textTheme.bodyMedium?.color,
-                  ),
+                  style: const TextStyle(fontSize: 14),
                 ),
               ],
             ),

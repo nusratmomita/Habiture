@@ -98,7 +98,7 @@ class HabitCard extends StatelessWidget {
                       if (isCompleted) {
                         bgColor = Colors.purple;
                       } else if (isMissed) {
-                        bgColor = Colors.redAccent;
+                        bgColor = const Color.fromARGB(255, 255, 82, 200);
                       } else {
                         bgColor = Colors.grey.shade300;
                       }
@@ -212,7 +212,7 @@ class HabitCard extends StatelessWidget {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('Delete Habit', style: Theme.of(context).textTheme.titleLarge),
-          content: Text('Are you sure you want to delete this habit?',
+          content: Text('Are you sure you want to delete this habit?You can not retrieve it after deletion',
               style: Theme.of(context).textTheme.bodyMedium),
           actions: [
             TextButton(
@@ -229,7 +229,7 @@ class HabitCard extends StatelessWidget {
                 style: Theme.of(context)
                     .textTheme
                     .bodyMedium
-                    ?.copyWith(color: Colors.red),
+                    ?.copyWith(color: const Color.fromARGB(255, 244, 54, 228)),
               ),
             ),
           ],
