@@ -21,7 +21,7 @@
 
 <h4>Project Preview: 👩‍💻</h4>
 <img src="https://i.ibb.co.com/VYHr9806/login-Page-Flutter.png" alt="loginPage">
-<img src="https://i.ibb.co.com/S4Qb6kd1/home-Page-Flutter.png" alt="homePage">
+<img src="https://i.ibb.co.com/xtWSZhjb/home-Page-Flutter.png" alt="homePage">
 <img src="https://i.ibb.co.com/0bTcjJc/progress.png" alt="progressPage">
 
 <h1>How to setup the project: 💻</h1>
